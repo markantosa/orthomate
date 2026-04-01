@@ -699,7 +699,7 @@
 
 (global_label "VBAT"
 (shape output)
-(at 48 36 0)
+(at 54 35 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -707,9 +707,9 @@
 )
 (justify left)
 )
-(uuid "aa000001-0000-0000-0000-000000000001")
+(uuid "aa100001-0000-0000-0000-000000000001")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 48 36 0)
+(at 54 35 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -720,7 +720,7 @@
 )
 (global_label "VBAT"
 (shape input)
-(at 60 36 180)
+(at 58 35 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -728,9 +728,9 @@
 )
 (justify right)
 )
-(uuid "aa000002-0000-0000-0000-000000000001")
+(uuid "aa100002-0000-0000-0000-000000000001")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 60 36 0)
+(at 58 35 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -741,7 +741,7 @@
 )
 (global_label "5V_SYS"
 (shape output)
-(at 104 36 0)
+(at 110 35 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -749,9 +749,9 @@
 )
 (justify left)
 )
-(uuid "aa000002-0000-0000-0000-000000000002")
+(uuid "aa100002-0000-0000-0000-000000000002")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 104 36 0)
+(at 110 35 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -762,7 +762,7 @@
 )
 (global_label "5V_SYS"
 (shape input)
-(at 116 12 180)
+(at 114 9 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -770,9 +770,9 @@
 )
 (justify right)
 )
-(uuid "aa000003-0000-0000-0000-000000000001")
+(uuid "aa100003-0000-0000-0000-000000000001")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 116 12 0)
+(at 114 9 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -783,7 +783,7 @@
 )
 (global_label "3V3"
 (shape output)
-(at 182 12 0)
+(at 188 9 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -791,9 +791,9 @@
 )
 (justify left)
 )
-(uuid "aa000003-0000-0000-0000-000000000002")
+(uuid "aa100003-0000-0000-0000-000000000002")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 182 12 0)
+(at 188 9 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -804,7 +804,7 @@
 )
 (global_label "FSR1_ADC"
 (shape input)
-(at 116 30 180)
+(at 114 25 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -812,9 +812,9 @@
 )
 (justify right)
 )
-(uuid "aa000003-0000-0000-0000-000000000003")
+(uuid "aa100003-0000-0000-0000-000000000003")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 116 30 0)
+(at 114 25 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -825,7 +825,7 @@
 )
 (global_label "FSR2_ADC"
 (shape input)
-(at 116 40 180)
+(at 114 35 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -833,9 +833,9 @@
 )
 (justify right)
 )
-(uuid "aa000003-0000-0000-0000-000000000004")
+(uuid "aa100003-0000-0000-0000-000000000004")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 116 40 0)
+(at 114 35 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -846,7 +846,7 @@
 )
 (global_label "FSR3_ADC"
 (shape input)
-(at 116 50 180)
+(at 114 45 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -854,9 +854,9 @@
 )
 (justify right)
 )
-(uuid "aa000003-0000-0000-0000-000000000005")
+(uuid "aa100003-0000-0000-0000-000000000005")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 116 50 0)
+(at 114 45 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -867,7 +867,7 @@
 )
 (global_label "FSR4_ADC"
 (shape input)
-(at 116 60 180)
+(at 114 55 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -875,9 +875,9 @@
 )
 (justify right)
 )
-(uuid "aa000003-0000-0000-0000-000000000006")
+(uuid "aa100003-0000-0000-0000-000000000006")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 116 60 0)
+(at 114 55 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -888,7 +888,7 @@
 )
 (global_label "VBAT_SENSE"
 (shape input)
-(at 116 70 180)
+(at 114 65 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -896,9 +896,9 @@
 )
 (justify right)
 )
-(uuid "aa000003-0000-0000-0000-000000000007")
+(uuid "aa100003-0000-0000-0000-000000000007")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 116 70 0)
+(at 114 65 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -909,7 +909,7 @@
 )
 (global_label "MODE_BTN"
 (shape input)
-(at 116 80 180)
+(at 114 78 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -917,9 +917,9 @@
 )
 (justify right)
 )
-(uuid "aa000003-0000-0000-0000-000000000008")
+(uuid "aa100003-0000-0000-0000-000000000008")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 116 80 0)
+(at 114 78 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -930,7 +930,7 @@
 )
 (global_label "CONN_DETECT"
 (shape input)
-(at 116 90 180)
+(at 114 91 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -938,9 +938,9 @@
 )
 (justify right)
 )
-(uuid "aa000003-0000-0000-0000-000000000009")
+(uuid "aa100003-0000-0000-0000-000000000009")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 116 90 0)
+(at 114 91 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -951,7 +951,7 @@
 )
 (global_label "STEPPER_ENN"
 (shape output)
-(at 182 30 0)
+(at 188 25 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -959,9 +959,9 @@
 )
 (justify left)
 )
-(uuid "aa000003-0000-0000-0000-00000000000a")
+(uuid "aa100003-0000-0000-0000-00000000000a")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 182 30 0)
+(at 188 25 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -972,7 +972,7 @@
 )
 (global_label "ACT1_STEP"
 (shape output)
-(at 182 40 0)
+(at 188 36 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -980,9 +980,9 @@
 )
 (justify left)
 )
-(uuid "aa000003-0000-0000-0000-00000000000b")
+(uuid "aa100003-0000-0000-0000-00000000000b")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 182 40 0)
+(at 188 36 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -993,7 +993,7 @@
 )
 (global_label "ACT1_DIR"
 (shape output)
-(at 182 50 0)
+(at 188 46 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1001,9 +1001,9 @@
 )
 (justify left)
 )
-(uuid "aa000003-0000-0000-0000-00000000000c")
+(uuid "aa100003-0000-0000-0000-00000000000c")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 182 50 0)
+(at 188 46 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1014,7 +1014,7 @@
 )
 (global_label "ACT2_STEP"
 (shape output)
-(at 182 60 0)
+(at 188 57 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1022,9 +1022,9 @@
 )
 (justify left)
 )
-(uuid "aa000003-0000-0000-0000-00000000000d")
+(uuid "aa100003-0000-0000-0000-00000000000d")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 182 60 0)
+(at 188 57 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1035,7 +1035,7 @@
 )
 (global_label "ACT2_DIR"
 (shape output)
-(at 182 70 0)
+(at 188 67 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1043,9 +1043,9 @@
 )
 (justify left)
 )
-(uuid "aa000003-0000-0000-0000-00000000000e")
+(uuid "aa100003-0000-0000-0000-00000000000e")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 182 70 0)
+(at 188 67 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1056,7 +1056,7 @@
 )
 (global_label "ACT3_STEP"
 (shape output)
-(at 182 80 0)
+(at 188 78 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1064,9 +1064,9 @@
 )
 (justify left)
 )
-(uuid "aa000003-0000-0000-0000-00000000000f")
+(uuid "aa100003-0000-0000-0000-00000000000f")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 182 80 0)
+(at 188 78 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1077,7 +1077,7 @@
 )
 (global_label "ACT3_DIR"
 (shape output)
-(at 182 90 0)
+(at 188 88 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1085,9 +1085,9 @@
 )
 (justify left)
 )
-(uuid "aa000003-0000-0000-0000-000000000010")
+(uuid "aa100003-0000-0000-0000-000000000010")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 182 90 0)
+(at 188 88 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1098,7 +1098,7 @@
 )
 (global_label "OLED_SDA"
 (shape output)
-(at 182 100 0)
+(at 188 99 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1106,9 +1106,9 @@
 )
 (justify left)
 )
-(uuid "aa000003-0000-0000-0000-000000000011")
+(uuid "aa100003-0000-0000-0000-000000000011")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 182 100 0)
+(at 188 99 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1119,7 +1119,7 @@
 )
 (global_label "OLED_SCL"
 (shape output)
-(at 182 110 0)
+(at 188 110 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1127,9 +1127,9 @@
 )
 (justify left)
 )
-(uuid "aa000003-0000-0000-0000-000000000012")
+(uuid "aa100003-0000-0000-0000-000000000012")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 182 110 0)
+(at 188 110 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1140,7 +1140,7 @@
 )
 (global_label "5V_SYS"
 (shape input)
-(at 194 12 180)
+(at 192 10 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1148,9 +1148,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-000000000001")
+(uuid "aa100004-0000-0000-0000-000000000001")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 12 0)
+(at 192 10 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1161,7 +1161,7 @@
 )
 (global_label "3V3"
 (shape input)
-(at 194 22 180)
+(at 192 19 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1169,9 +1169,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-000000000002")
+(uuid "aa100004-0000-0000-0000-000000000002")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 22 0)
+(at 192 19 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1182,7 +1182,7 @@
 )
 (global_label "STEPPER_ENN"
 (shape input)
-(at 194 32 180)
+(at 192 29 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1190,9 +1190,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-000000000003")
+(uuid "aa100004-0000-0000-0000-000000000003")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 32 0)
+(at 192 29 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1203,7 +1203,7 @@
 )
 (global_label "ACT1_STEP"
 (shape input)
-(at 194 42 180)
+(at 192 42 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1211,9 +1211,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-000000000004")
+(uuid "aa100004-0000-0000-0000-000000000004")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 42 0)
+(at 192 42 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1224,7 +1224,7 @@
 )
 (global_label "ACT1_DIR"
 (shape input)
-(at 194 52 180)
+(at 192 53 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1232,9 +1232,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-000000000005")
+(uuid "aa100004-0000-0000-0000-000000000005")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 52 0)
+(at 192 53 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1245,7 +1245,7 @@
 )
 (global_label "5V_SYS"
 (shape input)
-(at 194 78 180)
+(at 192 74 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1253,9 +1253,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-000000000006")
+(uuid "aa100004-0000-0000-0000-000000000006")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 78 0)
+(at 192 74 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1266,7 +1266,7 @@
 )
 (global_label "3V3"
 (shape input)
-(at 194 88 180)
+(at 192 83 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1274,9 +1274,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-000000000007")
+(uuid "aa100004-0000-0000-0000-000000000007")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 88 0)
+(at 192 83 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1287,7 +1287,7 @@
 )
 (global_label "STEPPER_ENN"
 (shape input)
-(at 194 98 180)
+(at 192 93 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1295,9 +1295,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-000000000008")
+(uuid "aa100004-0000-0000-0000-000000000008")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 98 0)
+(at 192 93 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1308,7 +1308,7 @@
 )
 (global_label "ACT2_STEP"
 (shape input)
-(at 194 108 180)
+(at 192 106 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1316,9 +1316,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-000000000009")
+(uuid "aa100004-0000-0000-0000-000000000009")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 108 0)
+(at 192 106 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1329,7 +1329,7 @@
 )
 (global_label "ACT2_DIR"
 (shape input)
-(at 194 118 180)
+(at 192 117 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1337,9 +1337,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-00000000000a")
+(uuid "aa100004-0000-0000-0000-00000000000a")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 118 0)
+(at 192 117 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1350,7 +1350,7 @@
 )
 (global_label "5V_SYS"
 (shape input)
-(at 194 142 180)
+(at 192 138 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1358,9 +1358,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-00000000000b")
+(uuid "aa100004-0000-0000-0000-00000000000b")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 142 0)
+(at 192 138 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1371,7 +1371,7 @@
 )
 (global_label "3V3"
 (shape input)
-(at 194 152 180)
+(at 192 147 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1379,9 +1379,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-00000000000c")
+(uuid "aa100004-0000-0000-0000-00000000000c")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 152 0)
+(at 192 147 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1392,7 +1392,7 @@
 )
 (global_label "STEPPER_ENN"
 (shape input)
-(at 194 162 180)
+(at 192 157 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1400,9 +1400,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-00000000000d")
+(uuid "aa100004-0000-0000-0000-00000000000d")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 162 0)
+(at 192 157 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1413,7 +1413,7 @@
 )
 (global_label "ACT3_STEP"
 (shape input)
-(at 194 172 180)
+(at 192 170 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1421,9 +1421,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-00000000000e")
+(uuid "aa100004-0000-0000-0000-00000000000e")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 172 0)
+(at 192 170 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1434,7 +1434,7 @@
 )
 (global_label "ACT3_DIR"
 (shape input)
-(at 194 182 180)
+(at 192 181 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1442,9 +1442,9 @@
 )
 (justify right)
 )
-(uuid "aa000004-0000-0000-0000-00000000000f")
+(uuid "aa100004-0000-0000-0000-00000000000f")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 194 182 0)
+(at 192 181 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1455,7 +1455,7 @@
 )
 (global_label "3V3"
 (shape input)
-(at 4 75 180)
+(at 2 70 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1463,9 +1463,9 @@
 )
 (justify right)
 )
-(uuid "aa000005-0000-0000-0000-000000000001")
+(uuid "aa100005-0000-0000-0000-000000000001")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 4 75 0)
+(at 2 70 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1476,7 +1476,7 @@
 )
 (global_label "FSR1_ADC"
 (shape output)
-(at 102 100 0)
+(at 108 85 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1484,9 +1484,9 @@
 )
 (justify left)
 )
-(uuid "aa000005-0000-0000-0000-000000000002")
+(uuid "aa100005-0000-0000-0000-000000000002")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 102 100 0)
+(at 108 85 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1497,7 +1497,7 @@
 )
 (global_label "FSR2_ADC"
 (shape output)
-(at 102 115 0)
+(at 108 105 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1505,9 +1505,9 @@
 )
 (justify left)
 )
-(uuid "aa000005-0000-0000-0000-000000000003")
+(uuid "aa100005-0000-0000-0000-000000000003")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 102 115 0)
+(at 108 105 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1518,7 +1518,7 @@
 )
 (global_label "FSR3_ADC"
 (shape output)
-(at 102 130 0)
+(at 108 125 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1526,9 +1526,9 @@
 )
 (justify left)
 )
-(uuid "aa000005-0000-0000-0000-000000000004")
+(uuid "aa100005-0000-0000-0000-000000000004")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 102 130 0)
+(at 108 125 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1539,7 +1539,7 @@
 )
 (global_label "FSR4_ADC"
 (shape output)
-(at 102 145 0)
+(at 108 145 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1547,9 +1547,9 @@
 )
 (justify left)
 )
-(uuid "aa000005-0000-0000-0000-000000000005")
+(uuid "aa100005-0000-0000-0000-000000000005")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 102 145 0)
+(at 108 145 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1560,7 +1560,7 @@
 )
 (global_label "VBAT"
 (shape input)
-(at 58 85 180)
+(at 56 80 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1568,9 +1568,9 @@
 )
 (justify right)
 )
-(uuid "aa000006-0000-0000-0000-000000000001")
+(uuid "aa100006-0000-0000-0000-000000000001")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 58 85 0)
+(at 56 80 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1581,7 +1581,7 @@
 )
 (global_label "VBAT_SENSE"
 (shape output)
-(at 102 85 0)
+(at 108 80 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1589,9 +1589,9 @@
 )
 (justify left)
 )
-(uuid "aa000006-0000-0000-0000-000000000002")
+(uuid "aa100006-0000-0000-0000-000000000002")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 102 85 0)
+(at 108 80 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1602,7 +1602,7 @@
 )
 (global_label "3V3"
 (shape input)
-(at 116 148 180)
+(at 114 145 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1610,9 +1610,9 @@
 )
 (justify right)
 )
-(uuid "aa000007-0000-0000-0000-000000000001")
+(uuid "aa100007-0000-0000-0000-000000000001")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 116 148 0)
+(at 114 145 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1623,7 +1623,7 @@
 )
 (global_label "OLED_SDA"
 (shape input)
-(at 116 162 180)
+(at 114 161 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1631,9 +1631,9 @@
 )
 (justify right)
 )
-(uuid "aa000007-0000-0000-0000-000000000002")
+(uuid "aa100007-0000-0000-0000-000000000002")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 116 162 0)
+(at 114 161 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1644,7 +1644,7 @@
 )
 (global_label "OLED_SCL"
 (shape input)
-(at 116 176 180)
+(at 114 177 180)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1652,9 +1652,9 @@
 )
 (justify right)
 )
-(uuid "aa000007-0000-0000-0000-000000000003")
+(uuid "aa100007-0000-0000-0000-000000000003")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 116 176 0)
+(at 114 177 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1665,7 +1665,7 @@
 )
 (global_label "MODE_BTN"
 (shape output)
-(at 102 192 0)
+(at 108 190 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1673,9 +1673,9 @@
 )
 (justify left)
 )
-(uuid "aa000008-0000-0000-0000-000000000001")
+(uuid "aa100008-0000-0000-0000-000000000001")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 102 192 0)
+(at 108 190 0)
 (effects
 (font
 (size 1.27 1.27)
@@ -1686,7 +1686,7 @@
 )
 (global_label "CONN_DETECT"
 (shape output)
-(at 102 210 0)
+(at 108 210 0)
 (fields_autoplaced yes)
 (effects
 (font
@@ -1694,9 +1694,9 @@
 )
 (justify left)
 )
-(uuid "aa000008-0000-0000-0000-000000000002")
+(uuid "aa100008-0000-0000-0000-000000000002")
 (property "Intersheetrefs" "${INTERSHEET_REFS}"
-(at 102 210 0)
+(at 108 210 0)
 (effects
 (font
 (size 1.27 1.27)
