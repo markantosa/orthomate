@@ -1,0 +1,22 @@
+# PlatformIO build artifacts
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor swap/backup
+*.swp
+*.swo
+*~
+*.bak
+
+# KiCad auto-save and lock files
+**/\#auto_saved_files\#
+**/_autosave-*
+**/*.lck
