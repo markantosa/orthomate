@@ -1,264 +1,1714 @@
-(kicad_sch (version 20250114) (generator "eeschema") (generator_version "9.0")
-  (paper "A3")
+(kicad_sch
+(version 20250114)
+(generator "eeschema")
+(generator_version "9.0")
+(uuid "08ac4b6e-1a22-4a08-b000-71ab08e6adf4")
+(paper "A3")
+(lib_symbols
+(symbol "power:GND"
+(power)
+(pin_names
+(offset 0)
+)
+(exclude_from_sim no)
+(in_bom yes)
+(on_board yes)
+(property "Reference" "#PWR"
+(at 0 -3 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+(property "Value" "GND"
+(at 0 -3.81 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+)
+)
+(property "Footprint" ""
+(at 0 0 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+(property "Datasheet" ""
+(at 0 0 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+(property "Description" ""
+(at 0 0 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+(symbol "GND_0_1"
+(polyline
+(pts
+(xy -1.27 -1.27) (xy 1.27 -1.27)
+)
+(stroke
+(width 0)
+(type default)
+)
+(fill
+(type none)
+)
+)
+(polyline
+(pts
+(xy -0.762 -1.905) (xy 0.762 -1.905)
+)
+(stroke
+(width 0)
+(type default)
+)
+(fill
+(type none)
+)
+)
+(polyline
+(pts
+(xy -0.254 -2.54) (xy 0.254 -2.54)
+)
+(stroke
+(width 0)
+(type default)
+)
+(fill
+(type none)
+)
+)
+(polyline
+(pts
+(xy 0 0) (xy 0 -1.27)
+)
+(stroke
+(width 0)
+(type default)
+)
+(fill
+(type none)
+)
+)
+)
+(symbol "GND_1_1"
+(pin power_in line
+(at 0 0 270)
+(length 0)
+(name "GND"
+(effects
+(font
+(size 1.27 1.27)
+)
+)
+)
+(number "1"
+(effects
+(font
+(size 1.27 1.27)
+)
+)
+)
+)
+)
+(embedded_fonts no)
+)
+)
 
-  (lib_symbols
-    (symbol "power:GND" (power) (pin_names (offset 0)) (in_bom yes) (on_board yes)
-      (property "Reference" "#PWR" (at 0 -3 0) (effects (font (size 1.27 1.27)) hide))
-      (property "Value" "GND" (at 0 -3.81 0) (effects (font (size 1.27 1.27))))
-      (property "Footprint" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-      (property "Datasheet" "" (at 0 0 0) (effects (font (size 1.27 1.27)) hide))
-      (symbol "GND_0_1"
-        (polyline (pts (xy 0 0) (xy 0 -1.27)) (stroke (width 0) (type default)) (fill (type none)))
-        (polyline (pts (xy -1.27 -1.27) (xy 1.27 -1.27)) (stroke (width 0) (type default)) (fill (type none)))
-        (polyline (pts (xy -0.762 -1.905) (xy 0.762 -1.905)) (stroke (width 0) (type default)) (fill (type none)))
-        (polyline (pts (xy -0.254 -2.54) (xy 0.254 -2.54)) (stroke (width 0) (type default)) (fill (type none))))
-      (symbol "GND_1_1"
-        (pin power_in line (at 0 0 270) (length 0)
-          (name "GND" (effects (font (size 1.27 1.27))))
-          (number "1" (effects (font (size 1.27 1.27)))))))
-  )
+(rectangle
+(start 2 2)
+(end 54 56)
+(stroke
+(width 0.2)
+(type default)
+)
+(fill
+(type none)
+)
+(uuid ccfb8df8-bd2f-405a-842b-cd3b2b03a69a)
+)
 
-  (rectangle (start 2 2) (end 54 56)
-    (stroke (width 0.2) (type default)) (fill (type none)))
-  (text "BLOCK 1 - POWER INPUT / BATTERY" (at 3 3 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "LiPo 2-pin connector\nMain latching power switch\nTP4056 module 4-pin header\nVBAT net output to Block 2\nUSB detect optional\nNote: charging and actuation MUTUALLY EXCLUSIVE" (at 3 6 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
-  (global_label "VBAT" (shape output) (at 48 30 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000001-0000-0000-0000-000000000001"))
+(rectangle
+(start 58 2)
+(end 110 56)
+(stroke
+(width 0.2)
+(type default)
+)
+(fill
+(type none)
+)
+(uuid d46679e1-50c2-4030-9e42-1792862ba3c3)
+)
 
-  (rectangle (start 58 2) (end 110 56)
-    (stroke (width 0.2) (type default)) (fill (type none)))
-  (text "BLOCK 2 - BOOST CONVERTER (XL6009)" (at 59 3 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "XL6009 module 4-pin header\nInput: VBAT\nOutput: 5V_SYS\nC_bulk1 = 470uF 35V electrolytic\nC_bulk2 = 470-1000uF 35V electrolytic\nC_dec   = 100nF ceramic\nKeep far from FSR analog zone" (at 59 6 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
-  (global_label "VBAT" (shape input) (at 60 30 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000002-0000-0000-0000-000000000001"))
-  (global_label "5V_SYS" (shape output) (at 104 30 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000002-0000-0000-0000-000000000002"))
+(rectangle
+(start 114 2)
+(end 188 130)
+(stroke
+(width 0.2)
+(type default)
+)
+(fill
+(type none)
+)
+(uuid 328822aa-273e-4264-97d8-ea29e6cda12a)
+)
 
-  (rectangle (start 114 2) (end 188 130)
-    (stroke (width 0.2) (type default)) (fill (type none)))
-  (text "BLOCK 3 - ESP32-C6 SUPERMINI HEADER" (at 115 3 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "Power: VIN <- 5V_SYS   GND\nOutput: 3V3 -> 3V3 net\nGPIO0  FSR1_ADC\nGPIO1  FSR2_ADC\nGPIO2  FSR3_ADC\nGPIO3  FSR4_ADC\nGPIO4  STEPPER_ENN\nGPIO5  VBAT_SENSE\nGPIO6  ACT1_STEP\nGPIO7  ACT1_DIR\nGPIO9  CONN_DETECT\nGPIO12 ACT2_STEP\nGPIO13 ACT2_DIR\nGPIO14 MODE_BTN\nGPIO20 ACT3_STEP\nGPIO21 ACT3_DIR\nGPIO22 OLED_SDA\nGPIO23 OLED_SCL\nAVOID: GPIO8, GPIO10, GPIO11, GPIO15, USB" (at 115 6 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
-  (global_label "5V_SYS" (shape input) (at 116 80 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000003-0000-0000-0000-000000000001"))
-  (global_label "3V3" (shape output) (at 182 80 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000003-0000-0000-0000-000000000002"))
-  (global_label "STEPPER_ENN" (shape output) (at 182 85 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000003-0000-0000-0000-000000000003"))
-  (global_label "ACT1_STEP" (shape output) (at 182 88 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000003-0000-0000-0000-000000000004"))
-  (global_label "ACT1_DIR" (shape output) (at 182 91 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000003-0000-0000-0000-000000000005"))
-  (global_label "ACT2_STEP" (shape output) (at 182 94 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000003-0000-0000-0000-000000000006"))
-  (global_label "ACT2_DIR" (shape output) (at 182 97 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000003-0000-0000-0000-000000000007"))
-  (global_label "ACT3_STEP" (shape output) (at 182 100 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000003-0000-0000-0000-000000000008"))
-  (global_label "ACT3_DIR" (shape output) (at 182 103 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000003-0000-0000-0000-000000000009"))
-  (global_label "OLED_SDA" (shape output) (at 182 106 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000003-0000-0000-0000-00000000000a"))
-  (global_label "OLED_SCL" (shape output) (at 182 109 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000003-0000-0000-0000-00000000000b"))
-  (global_label "FSR1_ADC" (shape output) (at 116 85 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000003-0000-0000-0000-00000000000c"))
-  (global_label "FSR2_ADC" (shape output) (at 116 88 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000003-0000-0000-0000-00000000000d"))
-  (global_label "FSR3_ADC" (shape output) (at 116 91 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000003-0000-0000-0000-00000000000e"))
-  (global_label "FSR4_ADC" (shape output) (at 116 94 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000003-0000-0000-0000-00000000000f"))
-  (global_label "VBAT_SENSE" (shape output) (at 116 97 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000003-0000-0000-0000-000000000010"))
-  (global_label "MODE_BTN" (shape output) (at 116 100 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000003-0000-0000-0000-000000000011"))
-  (global_label "CONN_DETECT" (shape output) (at 116 103 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000003-0000-0000-0000-000000000012"))
+(rectangle
+(start 192 2)
+(end 268 62)
+(stroke
+(width 0.2)
+(type default)
+)
+(fill
+(type none)
+)
+(uuid aec546f4-c5cb-4dfc-9c83-30c2a7d9a168)
+)
 
-  (rectangle (start 192 2) (end 268 62)
-    (stroke (width 0.2) (type default)) (fill (type none)))
-  (text "BLOCK 4A - TMC2209 #1 (ACT1)" (at 193 3 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "VM  <- 5V_SYS   C_VM = 100uF + 100nF\nVIO <- 3V3      C_VIO = 100nF\nGND\nSTEP <- ACT1_STEP\nDIR  <- ACT1_DIR\nENN  <- STEPPER_ENN\nOA1/OA2 -> ACT1 coil A -> J_MAIN 9/10\nOB1/OB2 -> ACT1 coil B -> J_MAIN 11/12\nTest pads: PDN_UART, DIAG" (at 193 6 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
-  (global_label "5V_SYS" (shape input) (at 194 42 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-000000000001"))
-  (global_label "3V3" (shape input) (at 194 45 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-000000000002"))
-  (global_label "ACT1_STEP" (shape input) (at 194 48 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-000000000003"))
-  (global_label "ACT1_DIR" (shape input) (at 194 51 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-000000000004"))
-  (global_label "STEPPER_ENN" (shape input) (at 194 54 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-000000000005"))
+(rectangle
+(start 192 66)
+(end 268 126)
+(stroke
+(width 0.2)
+(type default)
+)
+(fill
+(type none)
+)
+(uuid 84feba15-8827-4866-8167-8810af0d2965)
+)
 
-  (rectangle (start 192 66) (end 268 126)
-    (stroke (width 0.2) (type default)) (fill (type none)))
-  (text "BLOCK 4B - TMC2209 #2 (ACT2)" (at 193 67 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "VM  <- 5V_SYS   C_VM = 100uF + 100nF\nVIO <- 3V3      C_VIO = 100nF\nGND\nSTEP <- ACT2_STEP\nDIR  <- ACT2_DIR\nENN  <- STEPPER_ENN\nOA1/OA2 -> ACT2 coil A -> J_MAIN 13/14\nOB1/OB2 -> ACT2 coil B -> J_MAIN 15/16\nTest pads: PDN_UART, DIAG" (at 193 70 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
-  (global_label "5V_SYS" (shape input) (at 194 106 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-000000000006"))
-  (global_label "3V3" (shape input) (at 194 109 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-000000000007"))
-  (global_label "ACT2_STEP" (shape input) (at 194 112 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-000000000008"))
-  (global_label "ACT2_DIR" (shape input) (at 194 115 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-000000000009"))
-  (global_label "STEPPER_ENN" (shape input) (at 194 118 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-00000000000a"))
+(rectangle
+(start 192 130)
+(end 268 190)
+(stroke
+(width 0.2)
+(type default)
+)
+(fill
+(type none)
+)
+(uuid 6aa746e5-9bb1-4d31-9ba2-f277b3f23fc2)
+)
 
-  (rectangle (start 192 130) (end 268 190)
-    (stroke (width 0.2) (type default)) (fill (type none)))
-  (text "BLOCK 4C - TMC2209 #3 (ACT3)" (at 193 131 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "VM  <- 5V_SYS   C_VM = 100uF + 100nF\nVIO <- 3V3      C_VIO = 100nF\nGND\nSTEP <- ACT3_STEP\nDIR  <- ACT3_DIR\nENN  <- STEPPER_ENN\nOA1/OA2 -> ACT3 coil A -> J_MAIN 17/18\nOB1/OB2 -> ACT3 coil B -> J_MAIN 19/20\nTest pads: PDN_UART, DIAG" (at 193 134 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
-  (global_label "5V_SYS" (shape input) (at 194 170 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-00000000000b"))
-  (global_label "3V3" (shape input) (at 194 173 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-00000000000c"))
-  (global_label "ACT3_STEP" (shape input) (at 194 176 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-00000000000d"))
-  (global_label "ACT3_DIR" (shape input) (at 194 179 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-00000000000e"))
-  (global_label "STEPPER_ENN" (shape input) (at 194 182 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000004-0000-0000-0000-00000000000f"))
+(rectangle
+(start 272 2)
+(end 360 190)
+(stroke
+(width 0.2)
+(type default)
+)
+(fill
+(type none)
+)
+(uuid f7631da5-ff56-4451-ad96-e7303f45c958)
+)
 
-  (rectangle (start 2 60) (end 108 170)
-    (stroke (width 0.2) (type default)) (fill (type none)))
-  (text "BLOCK 5 - FSR ANALOG FRONT-END x4" (at 3 61 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "Per channel FSR1-FSR4:\n  3V3\n   |\n  FSR (off-board via J_MAIN pins 5-8)\n   |\n   +-- R_S = 1k --> FSRx_ADC (GPIOx)\n   |                      |\n  R_D = 10k            C=100nF -> GND\n   |\n  GND\n\nFSR1 J_MAIN pin5 -> GPIO0\nFSR2 J_MAIN pin6 -> GPIO1\nFSR3 J_MAIN pin7 -> GPIO2\nFSR4 J_MAIN pin8 -> GPIO3\nAll FSR supply from 3V3 ONLY" (at 3 64 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
-  (global_label "3V3" (shape input) (at 4 130 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000005-0000-0000-0000-000000000001"))
-  (global_label "FSR1_ADC" (shape output) (at 102 135 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000005-0000-0000-0000-000000000002"))
-  (global_label "FSR2_ADC" (shape output) (at 102 140 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000005-0000-0000-0000-000000000003"))
-  (global_label "FSR3_ADC" (shape output) (at 102 145 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000005-0000-0000-0000-000000000004"))
-  (global_label "FSR4_ADC" (shape output) (at 102 150 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000005-0000-0000-0000-000000000005"))
+(rectangle
+(start 2 60)
+(end 108 170)
+(stroke
+(width 0.2)
+(type default)
+)
+(fill
+(type none)
+)
+(uuid 30ae1a34-0286-4f7f-9442-6d773d5e54d9)
+)
 
-  (rectangle (start 56 60) (end 108 110)
-    (stroke (width 0.2) (type default)) (fill (type none)))
-  (text "BLOCK 6 - VBAT SENSE" (at 57 61 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "VBAT -- R1=100k --+-- VBAT_SENSE -> GPIO5\n                   |\n                  R2=100k\n                   |\n                  GND\nFirmware: ADC reads ~VBAT/2, scales x2\n< 3.5V = warn   < 3.35V = disable motors\n< 3.2V = shutdown" (at 57 64 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
-  (global_label "VBAT" (shape input) (at 58 95 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000006-0000-0000-0000-000000000001"))
-  (global_label "VBAT_SENSE" (shape output) (at 102 95 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000006-0000-0000-0000-000000000002"))
+(rectangle
+(start 56 60)
+(end 108 110)
+(stroke
+(width 0.2)
+(type default)
+)
+(fill
+(type none)
+)
+(uuid 76ec9c7a-122b-4255-8a05-9dcef9e2c69e)
+)
 
-  (rectangle (start 114 134) (end 188 190)
-    (stroke (width 0.2) (type default)) (fill (type none)))
-  (text "BLOCK 7 - OLED DISPLAY (SSD1306 0.91\")" (at 115 135 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "4-pin header J_OLED:\n  Pin1: VCC <- 3V3\n  Pin2: GND\n  Pin3: SDA <- OLED_SDA (GPIO22)\n  Pin4: SCL <- OLED_SCL (GPIO23)\nI2C address: 0x3C (verify on module)\nKeep traces short, away from boost zone" (at 115 138 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
-  (global_label "3V3" (shape input) (at 116 172 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000007-0000-0000-0000-000000000001"))
-  (global_label "OLED_SDA" (shape input) (at 116 176 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000007-0000-0000-0000-000000000002"))
-  (global_label "OLED_SCL" (shape input) (at 116 180 180) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid "aa000007-0000-0000-0000-000000000003"))
+(rectangle
+(start 114 134)
+(end 188 190)
+(stroke
+(width 0.2)
+(type default)
+)
+(fill
+(type none)
+)
+(uuid d1a26743-29ff-4a82-bc74-96a25a99e4e6)
+)
 
-  (rectangle (start 2 174) (end 108 230)
-    (stroke (width 0.2) (type default)) (fill (type none)))
-  (text "BLOCK 8 - USER INTERFACE" (at 3 175 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "Mode button (momentary NO):\n  GPIO14 -- BTN -- GND\n  GPIO14 = INPUT_PULLUP\n  Optional: 100nF across button\n\nConnector detect:\n  J_MAIN pin1 (3V3_SENSE)\n   -- 10k --> GPIO9 (INPUT_PULLDOWN)\n  Plugged=HIGH, Removed=LOW\n\nMain power switch:\n  Hardware latching switch in series\n  with LiPo -> TP4056 - no GPIO needed" (at 3 178 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
-  (global_label "MODE_BTN" (shape output) (at 102 208 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000008-0000-0000-0000-000000000001"))
-  (global_label "CONN_DETECT" (shape output) (at 102 213 0) (fields_autoplaced yes)
-    (effects (font (size 1.27 1.27)) (justify left))
-    (uuid "aa000008-0000-0000-0000-000000000002"))
+(rectangle
+(start 2 174)
+(end 108 230)
+(stroke
+(width 0.2)
+(type default)
+)
+(fill
+(type none)
+)
+(uuid 1c117ce9-a1a0-4421-ba09-b8409ec7803f)
+)
 
-  (rectangle (start 272 2) (end 360 190)
-    (stroke (width 0.2) (type default)) (fill (type none)))
-  (text "BLOCK 9 - J_MAIN (20-PIN INSOLE CONNECTOR)" (at 273 3 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "Pin  Net           Dir\n  1  3V3_SENSE     -> insole (connector detect)\n  2  5V_SYS        -> insole\n  3  GND\n  4  GND           (duplicate return)\n  5  FSR1_RAW      <- sensor\n  6  FSR2_RAW      <- sensor\n  7  FSR3_RAW      <- sensor\n  8  FSR4_RAW      <- sensor\n  9  ACT1_OA1      -> coil\n 10  ACT1_OA2      -> coil\n 11  ACT1_OB1      -> coil\n 12  ACT1_OB2      -> coil\n 13  ACT2_OA1      -> coil\n 14  ACT2_OA2      -> coil\n 15  ACT2_OB1      -> coil\n 16  ACT2_OB2      -> coil\n 17  ACT3_OA1      -> coil\n 18  ACT3_OA2      -> coil\n 19  ACT3_OB1      -> coil\n 20  ACT3_OB2      -> coil\n\nDual GND pins mandatory for motor return current\nConnector: IDC / Molex / screw terminal" (at 273 6 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
+(rectangle
+(start 114 194)
+(end 268 250)
+(stroke
+(width 0.35)
+(type dash)
+)
+(fill
+(type none)
+)
+(uuid 73391433-4d65-4b76-8bd8-f1f94b624cf8)
+)
 
-  (rectangle (start 114 194) (end 268 250)
-    (stroke (width 0.35) (type dash)) (fill (type none)))
-  (text "PIN MAP - DO NOT CHANGE WITHOUT LAYOUT REVIEW" (at 115 195 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "GPIO0  = FSR1_METATARSAL (ADC)\nGPIO1  = FSR2_ARCH (ADC)\nGPIO2  = FSR3_CALCANEUS (ADC)\nGPIO3  = FSR4_AUX (ADC)\nGPIO4  = STEPPER_ENN (active LOW)\nGPIO5  = VBAT_SENSE (ADC - 1:2 divider)\nGPIO6  = ACT1_STEP\nGPIO7  = ACT1_DIR\nGPIO9  = CONN_DETECT (INPUT_PULLDOWN)\nGPIO12 = ACT2_STEP\nGPIO13 = ACT2_DIR\nGPIO14 = MODE_BUTTON (INPUT_PULLUP)\nGPIO20 = ACT3_STEP\nGPIO21 = ACT3_DIR\nGPIO22 = OLED_SDA\nGPIO23 = OLED_SCL\nAVOID: GPIO8 (RGB LED)  GPIO10/11 (not broken out)\n       GPIO15 (boot strap)  USB pins" (at 115 198 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
+(rectangle
+(start 272 194)
+(end 420 250)
+(stroke
+(width 0.35)
+(type dash)
+)
+(fill
+(type none)
+)
+(uuid 12fe4ec7-a648-4283-8c43-20270da2cc0d)
+)
 
-  (rectangle (start 272 194) (end 420 250)
-    (stroke (width 0.35) (type dash)) (fill (type none)))
-  (text "ENGINEERING NOTES" (at 273 195 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "POWER:\n  ESP32 powered from 5V_SYS ONLY - never directly from LiPo\n  Charging and actuation MUTUALLY EXCLUSIVE\n  Firmware disables STEPPER_ENN on USB/charge detect\n\nLAYOUT (single-layer PCB - jumpers allowed):\n  Zone A (LEFT):   LiPo, TP4056, XL6009, bulk caps\n  Zone B (CENTRE): TMC2209, motor output traces\n  Zone C (RIGHT):  ESP32, FSR, OLED - farthest from boost\n  NEVER route motor return current through analog ground\n  Trunk+branch ground topology (battery-neg = origin)\n\nTRACE WIDTHS:\n  Power/GND: 1.5-2.0mm   Motor: 0.8-1.2mm\n  Digital: 0.25-0.4mm    Analog/I2C: 0.25-0.4mm\n\nFIRMWARE RULES:\n  Never start all 3 motors simultaneously (stagger 50-100ms)\n  Sample FSR only when motors idle or use median filter x5\n  OLED update rate <= 10Hz during actuation\n  Expose PDN_UART and DIAG pads per TMC2209\n  USB port on ESP32 and TP4056 must remain accessible" (at 273 198 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
+(rectangle
+(start 2 234)
+(end 108 290)
+(stroke
+(width 0.35)
+(type dash)
+)
+(fill
+(type none)
+)
+(uuid 4ff60f73-d3d7-47a9-a809-b37dae7287b9)
+)
 
-  (rectangle (start 2 234) (end 108 290)
-    (stroke (width 0.35) (type dash)) (fill (type none)))
-  (text "PASSIVES CHECKLIST" (at 3 235 0)
-    (effects (font (size 1.5 1.5) bold) (justify left)))
-  (text "XL6009 output:\n  [ ] 470uF 35V electrolytic\n  [ ] 470-1000uF 35V electrolytic (extra)\n  [ ] 100nF ceramic\nESP32 3V3 supply:\n  [ ] 10uF\n  [ ] 100nF ceramic\nPer TMC2209 x3:\n  [ ] 100uF electrolytic on VM\n  [ ] 100nF ceramic on VM\n  [ ] 100nF ceramic on VIO\nFSR front-end x4:\n  [ ] 10k pull-down\n  [ ] 1k series\n  [ ] 100nF at ADC pin\nBattery sense:\n  [ ] 100k + 100k divider\nUser interface:\n  [ ] 10k pull-down for CONN_DETECT\n  [ ] Optional 100nF across mode button" (at 3 238 0)
-    (effects (font (size 1.0 1.0)) (justify left top)))
+(text "BLOCK 1 - POWER INPUT / BATTERY"
+(exclude_from_sim no)
+(at 3 3 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "094b22af-a3cb-46d8-b327-eae1d119b35b")
+)
+(text "LiPo 2-pin connector\nMain latching power switch\nTP4056 module 4-pin header\nVBAT net output to Block 2\nUSB detect optional\nNote: charging and actuation MUTUALLY EXCLUSIVE"
+(exclude_from_sim no)
+(at 3 6 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "ba008675-6f86-4b64-9d88-f32705c6fbc9")
+)
 
-  (symbol_instances)
+(text "BLOCK 2 - BOOST CONVERTER (XL6009)"
+(exclude_from_sim no)
+(at 59 3 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "d4a60a63-fc6d-41fb-be06-e354c6ea782d")
+)
+(text "XL6009 module 4-pin header\nInput: VBAT\nOutput: 5V_SYS\nC_bulk1 = 470uF 35V electrolytic\nC_bulk2 = 470-1000uF 35V electrolytic\nC_dec   = 100nF ceramic\nKeep far from FSR analog zone"
+(exclude_from_sim no)
+(at 59 6 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "ade05d84-0009-497b-aba0-ff1626843605")
+)
+
+(text "BLOCK 3 - ESP32-C6 SUPERMINI HEADER"
+(exclude_from_sim no)
+(at 115 3 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "788fc413-c322-4a64-9645-e68dd1835c4c")
+)
+(text "Power: VIN <- 5V_SYS   GND\nOutput: 3V3 -> 3V3 net\nGPIO0  FSR1_ADC\nGPIO1  FSR2_ADC\nGPIO2  FSR3_ADC\nGPIO3  FSR4_ADC\nGPIO4  STEPPER_ENN\nGPIO5  VBAT_SENSE\nGPIO6  ACT1_STEP\nGPIO7  ACT1_DIR\nGPIO9  CONN_DETECT\nGPIO12 ACT2_STEP\nGPIO13 ACT2_DIR\nGPIO14 MODE_BTN\nGPIO20 ACT3_STEP\nGPIO21 ACT3_DIR\nGPIO22 OLED_SDA\nGPIO23 OLED_SCL\nAVOID: GPIO8, GPIO10, GPIO11, GPIO15, USB"
+(exclude_from_sim no)
+(at 115 6 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "5768f809-a48e-459f-8b07-d065abed43a2")
+)
+
+(text "BLOCK 4A - TMC2209 #1 (ACT1)"
+(exclude_from_sim no)
+(at 193 3 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "b0a8a719-a067-4c62-86e3-48da7661f21f")
+)
+(text "VM  <- 5V_SYS   C_VM = 100uF + 100nF\nVIO <- 3V3      C_VIO = 100nF\nGND\nSTEP <- ACT1_STEP\nDIR  <- ACT1_DIR\nENN  <- STEPPER_ENN\nOA1/OA2 -> ACT1 coil A -> J_MAIN 9/10\nOB1/OB2 -> ACT1 coil B -> J_MAIN 11/12\nTest pads: PDN_UART, DIAG"
+(exclude_from_sim no)
+(at 193 6 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "892266fa-bae0-414f-b35c-bf1418e1715e")
+)
+
+(text "BLOCK 4B - TMC2209 #2 (ACT2)"
+(exclude_from_sim no)
+(at 193 67 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "2fc360d8-5323-496c-9ec7-27640e581831")
+)
+(text "VM  <- 5V_SYS   C_VM = 100uF + 100nF\nVIO <- 3V3      C_VIO = 100nF\nGND\nSTEP <- ACT2_STEP\nDIR  <- ACT2_DIR\nENN  <- STEPPER_ENN\nOA1/OA2 -> ACT2 coil A -> J_MAIN 13/14\nOB1/OB2 -> ACT2 coil B -> J_MAIN 15/16\nTest pads: PDN_UART, DIAG"
+(exclude_from_sim no)
+(at 193 70 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "1eef10ee-aff9-4be3-8af8-b4856345ecd1")
+)
+
+(text "BLOCK 4C - TMC2209 #3 (ACT3)"
+(exclude_from_sim no)
+(at 193 131 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "29e149d1-6846-4c65-a383-75a80c923177")
+)
+(text "VM  <- 5V_SYS   C_VM = 100uF + 100nF\nVIO <- 3V3      C_VIO = 100nF\nGND\nSTEP <- ACT3_STEP\nDIR  <- ACT3_DIR\nENN  <- STEPPER_ENN\nOA1/OA2 -> ACT3 coil A -> J_MAIN 17/18\nOB1/OB2 -> ACT3 coil B -> J_MAIN 19/20\nTest pads: PDN_UART, DIAG"
+(exclude_from_sim no)
+(at 193 134 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "b738ee3e-6088-43ee-8f70-81b73b392172")
+)
+
+(text "BLOCK 5 - FSR ANALOG FRONT-END x4"
+(exclude_from_sim no)
+(at 3 61 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "d1d41d59-71bf-4e08-9424-1f0f6df1f748")
+)
+(text "Per channel FSR1-FSR4:\n  3V3\n   |\n  FSR (off-board via J_MAIN pins 5-8)\n   |\n   +-- R_S = 1k --> FSRx_ADC (GPIOx)\n   |                      |\n  R_D = 10k            C=100nF -> GND\n   |\n  GND\n\nFSR1 J_MAIN pin5 -> GPIO0\nFSR2 J_MAIN pin6 -> GPIO1\nFSR3 J_MAIN pin7 -> GPIO2\nFSR4 J_MAIN pin8 -> GPIO3\nAll FSR supply from 3V3 ONLY"
+(exclude_from_sim no)
+(at 3 64 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "32cac2e4-9535-4f4a-8637-55abfe4a9f74")
+)
+
+(text "BLOCK 6 - VBAT SENSE"
+(exclude_from_sim no)
+(at 57 61 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "cb58789f-057b-498c-b823-6eaa6419da3a")
+)
+(text "VBAT -- R1=100k --+-- VBAT_SENSE -> GPIO5\n                   |\n                  R2=100k\n                   |\n                  GND\nFirmware: ADC reads ~VBAT/2, scales x2\n< 3.5V = warn   < 3.35V = disable motors\n< 3.2V = shutdown"
+(exclude_from_sim no)
+(at 57 64 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "4d289891-1e55-4369-950a-efcb46749958")
+)
+
+(text "BLOCK 7 - OLED DISPLAY (SSD1306 0.91\")"
+(exclude_from_sim no)
+(at 115 135 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "04e79754-ec6e-4402-a9b5-851845e8b771")
+)
+(text "4-pin header J_OLED:\n  Pin1: VCC <- 3V3\n  Pin2: GND\n  Pin3: SDA <- OLED_SDA (GPIO22)\n  Pin4: SCL <- OLED_SCL (GPIO23)\nI2C address: 0x3C (verify on module)\nKeep traces short, away from boost zone"
+(exclude_from_sim no)
+(at 115 138 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "5d298093-d7a9-4998-8c25-f4cd5c1cb0cb")
+)
+
+(text "BLOCK 8 - USER INTERFACE"
+(exclude_from_sim no)
+(at 3 175 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "aab61acf-0cb0-492c-a6cf-a32d135b09fd")
+)
+(text "Mode button (momentary NO):\n  GPIO14 -- BTN -- GND\n  GPIO14 = INPUT_PULLUP\n  Optional: 100nF across button\n\nConnector detect:\n  J_MAIN pin1 (3V3_SENSE)\n   -- 10k --> GPIO9 (INPUT_PULLDOWN)\n  Plugged=HIGH, Removed=LOW\n\nMain power switch:\n  Hardware latching switch in series\n  with LiPo -> TP4056 - no GPIO needed"
+(exclude_from_sim no)
+(at 3 178 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "a83c3638-2c00-4cc0-8d93-1d35f1b48b69")
+)
+
+(text "BLOCK 9 - J_MAIN (20-PIN INSOLE CONNECTOR)"
+(exclude_from_sim no)
+(at 273 3 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "0260b674-ffec-40bb-9192-8b36f4311ec0")
+)
+(text "Pin  Net           Dir\n  1  3V3_SENSE     -> insole (connector detect)\n  2  5V_SYS        -> insole\n  3  GND\n  4  GND           (duplicate return)\n  5  FSR1_RAW      <- sensor\n  6  FSR2_RAW      <- sensor\n  7  FSR3_RAW      <- sensor\n  8  FSR4_RAW      <- sensor\n  9  ACT1_OA1      -> coil\n 10  ACT1_OA2      -> coil\n 11  ACT1_OB1      -> coil\n 12  ACT1_OB2      -> coil\n 13  ACT2_OA1      -> coil\n 14  ACT2_OA2      -> coil\n 15  ACT2_OB1      -> coil\n 16  ACT2_OB2      -> coil\n 17  ACT3_OA1      -> coil\n 18  ACT3_OA2      -> coil\n 19  ACT3_OB1      -> coil\n 20  ACT3_OB2      -> coil\n\nDual GND pins mandatory for motor return current\nConnector: IDC / Molex / screw terminal"
+(exclude_from_sim no)
+(at 273 6 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "0edcae7a-5f97-4e95-96f5-6fa75e94c2ec")
+)
+
+(text "PIN MAP - DO NOT CHANGE WITHOUT LAYOUT REVIEW"
+(exclude_from_sim no)
+(at 115 195 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "6be24a52-9a88-498e-8dc1-78e7fa444b6f")
+)
+(text "GPIO0  = FSR1_METATARSAL (ADC)\nGPIO1  = FSR2_ARCH (ADC)\nGPIO2  = FSR3_CALCANEUS (ADC)\nGPIO3  = FSR4_AUX (ADC)\nGPIO4  = STEPPER_ENN (active LOW)\nGPIO5  = VBAT_SENSE (ADC - 1:2 divider)\nGPIO6  = ACT1_STEP\nGPIO7  = ACT1_DIR\nGPIO9  = CONN_DETECT (INPUT_PULLDOWN)\nGPIO12 = ACT2_STEP\nGPIO13 = ACT2_DIR\nGPIO14 = MODE_BUTTON (INPUT_PULLUP)\nGPIO20 = ACT3_STEP\nGPIO21 = ACT3_DIR\nGPIO22 = OLED_SDA\nGPIO23 = OLED_SCL\nAVOID: GPIO8 (RGB LED)  GPIO10/11 (not broken out)\n       GPIO15 (boot strap)  USB pins"
+(exclude_from_sim no)
+(at 115 198 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "f6376d85-5630-4592-8aa3-07cedefeed90")
+)
+
+(text "ENGINEERING NOTES"
+(exclude_from_sim no)
+(at 273 195 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "fa9ba984-5a8f-4dba-925b-a5b00189dfa7")
+)
+(text "POWER:\n  ESP32 powered from 5V_SYS ONLY - never directly from LiPo\n  Charging and actuation MUTUALLY EXCLUSIVE\n  Firmware disables STEPPER_ENN on USB/charge detect\n\nLAYOUT (single-layer PCB - jumpers allowed):\n  Zone A (LEFT):   LiPo, TP4056, XL6009, bulk caps\n  Zone B (CENTRE): TMC2209, motor output traces\n  Zone C (RIGHT):  ESP32, FSR, OLED - farthest from boost\n  NEVER route motor return current through analog ground\n  Trunk+branch ground topology (battery-neg = origin)\n\nTRACE WIDTHS:\n  Power/GND: 1.5-2.0mm   Motor: 0.8-1.2mm\n  Digital: 0.25-0.4mm    Analog/I2C: 0.25-0.4mm\n\nFIRMWARE RULES:\n  Never start all 3 motors simultaneously (stagger 50-100ms)\n  Sample FSR only when motors idle or use median filter x5\n  OLED update rate <= 10Hz during actuation\n  Expose PDN_UART and DIAG pads per TMC2209\n  USB port on ESP32 and TP4056 must remain accessible"
+(exclude_from_sim no)
+(at 273 198 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "e0492219-99b1-4080-aa57-44118eded0fb")
+)
+
+(text "PASSIVES CHECKLIST"
+(exclude_from_sim no)
+(at 3 235 0)
+(effects
+(font
+(size 1.5 1.5)
+(bold yes)
+)
+(justify left)
+)
+(uuid "27cc0328-8ddf-40a6-975d-641a690f0450")
+)
+(text "XL6009 output:\n  [ ] 470uF 35V electrolytic\n  [ ] 470-1000uF 35V electrolytic (extra)\n  [ ] 100nF ceramic\nESP32 3V3 supply:\n  [ ] 10uF\n  [ ] 100nF ceramic\nPer TMC2209 x3:\n  [ ] 100uF electrolytic on VM\n  [ ] 100nF ceramic on VM\n  [ ] 100nF ceramic on VIO\nFSR front-end x4:\n  [ ] 10k pull-down\n  [ ] 1k series\n  [ ] 100nF at ADC pin\nBattery sense:\n  [ ] 100k + 100k divider\nUser interface:\n  [ ] 10k pull-down for CONN_DETECT\n  [ ] Optional 100nF across mode button"
+(exclude_from_sim no)
+(at 3 238 0)
+(effects
+(font
+(size 1 1)
+)
+(justify left top)
+)
+(uuid "cbb5885d-cc6c-4eed-b7bf-add217989532")
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(global_label "VBAT"
+(shape output)
+(at 48 36 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000001-0000-0000-0000-000000000001")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 48 36 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "VBAT"
+(shape input)
+(at 60 36 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000002-0000-0000-0000-000000000001")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 60 36 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "5V_SYS"
+(shape output)
+(at 104 36 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000002-0000-0000-0000-000000000002")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 104 36 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "5V_SYS"
+(shape input)
+(at 116 12 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000003-0000-0000-0000-000000000001")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 116 12 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "3V3"
+(shape output)
+(at 182 12 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000003-0000-0000-0000-000000000002")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 182 12 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "FSR1_ADC"
+(shape input)
+(at 116 30 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000003-0000-0000-0000-000000000003")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 116 30 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "FSR2_ADC"
+(shape input)
+(at 116 40 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000003-0000-0000-0000-000000000004")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 116 40 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "FSR3_ADC"
+(shape input)
+(at 116 50 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000003-0000-0000-0000-000000000005")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 116 50 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "FSR4_ADC"
+(shape input)
+(at 116 60 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000003-0000-0000-0000-000000000006")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 116 60 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "VBAT_SENSE"
+(shape input)
+(at 116 70 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000003-0000-0000-0000-000000000007")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 116 70 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "MODE_BTN"
+(shape input)
+(at 116 80 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000003-0000-0000-0000-000000000008")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 116 80 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "CONN_DETECT"
+(shape input)
+(at 116 90 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000003-0000-0000-0000-000000000009")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 116 90 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "STEPPER_ENN"
+(shape output)
+(at 182 30 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000003-0000-0000-0000-00000000000a")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 182 30 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "ACT1_STEP"
+(shape output)
+(at 182 40 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000003-0000-0000-0000-00000000000b")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 182 40 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "ACT1_DIR"
+(shape output)
+(at 182 50 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000003-0000-0000-0000-00000000000c")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 182 50 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "ACT2_STEP"
+(shape output)
+(at 182 60 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000003-0000-0000-0000-00000000000d")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 182 60 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "ACT2_DIR"
+(shape output)
+(at 182 70 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000003-0000-0000-0000-00000000000e")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 182 70 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "ACT3_STEP"
+(shape output)
+(at 182 80 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000003-0000-0000-0000-00000000000f")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 182 80 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "ACT3_DIR"
+(shape output)
+(at 182 90 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000003-0000-0000-0000-000000000010")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 182 90 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "OLED_SDA"
+(shape output)
+(at 182 100 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000003-0000-0000-0000-000000000011")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 182 100 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "OLED_SCL"
+(shape output)
+(at 182 110 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000003-0000-0000-0000-000000000012")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 182 110 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "5V_SYS"
+(shape input)
+(at 194 12 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-000000000001")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 12 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "3V3"
+(shape input)
+(at 194 22 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-000000000002")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 22 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "STEPPER_ENN"
+(shape input)
+(at 194 32 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-000000000003")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 32 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "ACT1_STEP"
+(shape input)
+(at 194 42 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-000000000004")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 42 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "ACT1_DIR"
+(shape input)
+(at 194 52 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-000000000005")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 52 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "5V_SYS"
+(shape input)
+(at 194 78 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-000000000006")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 78 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "3V3"
+(shape input)
+(at 194 88 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-000000000007")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 88 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "STEPPER_ENN"
+(shape input)
+(at 194 98 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-000000000008")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 98 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "ACT2_STEP"
+(shape input)
+(at 194 108 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-000000000009")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 108 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "ACT2_DIR"
+(shape input)
+(at 194 118 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-00000000000a")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 118 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "5V_SYS"
+(shape input)
+(at 194 142 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-00000000000b")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 142 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "3V3"
+(shape input)
+(at 194 152 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-00000000000c")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 152 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "STEPPER_ENN"
+(shape input)
+(at 194 162 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-00000000000d")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 162 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "ACT3_STEP"
+(shape input)
+(at 194 172 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-00000000000e")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 172 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "ACT3_DIR"
+(shape input)
+(at 194 182 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000004-0000-0000-0000-00000000000f")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 194 182 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "3V3"
+(shape input)
+(at 4 75 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000005-0000-0000-0000-000000000001")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 4 75 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "FSR1_ADC"
+(shape output)
+(at 102 100 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000005-0000-0000-0000-000000000002")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 102 100 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "FSR2_ADC"
+(shape output)
+(at 102 115 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000005-0000-0000-0000-000000000003")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 102 115 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "FSR3_ADC"
+(shape output)
+(at 102 130 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000005-0000-0000-0000-000000000004")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 102 130 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "FSR4_ADC"
+(shape output)
+(at 102 145 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000005-0000-0000-0000-000000000005")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 102 145 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "VBAT"
+(shape input)
+(at 58 85 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000006-0000-0000-0000-000000000001")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 58 85 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "VBAT_SENSE"
+(shape output)
+(at 102 85 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000006-0000-0000-0000-000000000002")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 102 85 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "3V3"
+(shape input)
+(at 116 148 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000007-0000-0000-0000-000000000001")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 116 148 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "OLED_SDA"
+(shape input)
+(at 116 162 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000007-0000-0000-0000-000000000002")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 116 162 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "OLED_SCL"
+(shape input)
+(at 116 176 180)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify right)
+)
+(uuid "aa000007-0000-0000-0000-000000000003")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 116 176 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "MODE_BTN"
+(shape output)
+(at 102 192 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000008-0000-0000-0000-000000000001")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 102 192 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(global_label "CONN_DETECT"
+(shape output)
+(at 102 210 0)
+(fields_autoplaced yes)
+(effects
+(font
+(size 1.27 1.27)
+)
+(justify left)
+)
+(uuid "aa000008-0000-0000-0000-000000000002")
+(property "Intersheetrefs" "${INTERSHEET_REFS}"
+(at 102 210 0)
+(effects
+(font
+(size 1.27 1.27)
+)
+(hide yes)
+)
+)
+)
+(sheet_instances
+(path "/"
+(page "1")
+)
+)
+(embedded_fonts no)
 )
