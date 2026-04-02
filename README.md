@@ -21,7 +21,7 @@ Battery-powered adaptive orthopedic insole controller. Redistributes plantar pre
 
 ```
 pumped-up-kicks/
-├── Electronics Reference.txt   # Hardware design spec (v4.1)
+├── Electronics Reference.txt   # Hardware design spec (v5.0)
 ├── BOM.txt                     # Bill of materials
 ├── firmware/
 │   ├── main/                   # Full operational firmware (PlatformIO)
@@ -55,11 +55,10 @@ CONNECTED  ──[btn]──►  MEASURING  ──(auto)──►  MEASURED
 |------|-----------|
 | **Measurement** | Reads all 4 FSR channels, median-filters, computes relative load fractions |
 | **Actuation** | Drives each actuator inversely proportional to its region's load — lowest load = largest extension |
-| **Connector detect** | GPIO9 detects J_MAIN; unplugging at any point disables drivers immediately |
 
 Extension formula: $ext_i \propto (1 - r_i)$ where $r_i = F_i / \sum F$
 
-## GPIO assignment (ESP32-C6 SuperMini, v4.1)
+## GPIO assignment (ESP32-C6 SuperMini, v5.0)
 
 | GPIO | Function |
 |------|----------|
@@ -67,18 +66,17 @@ Extension formula: $ext_i \propto (1 - r_i)$ where $r_i = F_i / \sum F$
 | 1 | FSR2 ARCH (ADC) |
 | 2 | FSR3 CALCANEUS (ADC) |
 | 3 | FSR4 AUX (ADC) |
-| 4 | STEPPER\_ENN\_SHARED (active LOW) |
-| 5 | VBAT\_SENSE (ADC) |
-| 6 | ACT1\_STEP |
-| 7 | ACT1\_DIR |
-| 9 | CONN\_DETECT (INPUT\_PULLDOWN) |
-| 12 | ACT2\_STEP |
-| 13 | ACT2\_DIR |
-| 14 | MODE\_BUTTON (INPUT\_PULLUP) |
-| 20 | ACT3\_STEP |
-| 21 | ACT3\_DIR |
-| 22 | OLED SDA (I2C) |
-| 23 | OLED SCL (I2C) |
+| 4 | MODE\_BUTTON (INPUT\_PULLUP) — boot-safe usage |
+| 6 | VBAT\_SENSE (ADC) |
+| 7 | STEPPER\_ENN\_SHARED (active LOW) |
+| 9 | OLED SDA (I2C) |
+| 14 | ACT2\_DIR |
+| 15 | OLED SCL (I2C) |
+| 16 | ACT3\_STEP |
+| 17 | ACT3\_DIR |
+| 18 | ACT2\_STEP |
+| 19 | ACT1\_DIR |
+| 20 | ACT1\_STEP |
 
 ## Quick start — flashing firmware
 

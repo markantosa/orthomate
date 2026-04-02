@@ -3,10 +3,10 @@
  *
  * Moves ACT1 (TMC2209 in STEP/DIR mode) back and forth.
  *
- * Wiring (matches Electronics Reference v3.1):
- *   GPIO 6  → ACT1_STEP
- *   GPIO 7  → ACT1_DIR
- *   GPIO 4  → STEPPER_ENN_SHARED  (active LOW — pulled LOW to enable)
+ * Wiring (matches Electronics Reference v5.0):
+ *   GPIO 20 → ACT1_STEP
+ *   GPIO 19 → ACT1_DIR
+ *   GPIO 7  → STEPPER_ENN_SHARED  (active LOW — pulled LOW to enable)
  *
  * The TMC2209 is in stand-alone STEP/DIR mode; no UART is used here.
  * Current / microstep settings are configured by the on-board trim pot
@@ -16,9 +16,9 @@
 #include <Arduino.h>
 
 // ── Pin definitions ──────────────────────────────────────────────────────────
-static constexpr uint8_t PIN_STEP = 6;   // ACT1_STEP
-static constexpr uint8_t PIN_DIR  = 7;   // ACT1_DIR
-static constexpr uint8_t PIN_ENN  = 4;   // STEPPER_ENN_SHARED (active LOW)
+static constexpr uint8_t PIN_STEP = 20;  // ACT1_STEP
+static constexpr uint8_t PIN_DIR  = 19;  // ACT1_DIR
+static constexpr uint8_t PIN_ENN  = 7;   // STEPPER_ENN_SHARED (active LOW)
 
 // ── Motion parameters ────────────────────────────────────────────────────────
 // Adjust STEPS_PER_MOVE and STEP_DELAY_US to match your actuator travel.

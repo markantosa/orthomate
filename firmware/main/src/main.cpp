@@ -1,7 +1,7 @@
 /**
  * EPD 3D G6 — Pumped Up Kicks V2
  * Full operational prototype firmware
- * Hardware Reference v4.1
+ * Hardware Reference v5.0
  *
  * ┌──────────────────────────────────────────────────────┐
  * │  State machine                                        │
@@ -30,17 +30,17 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-// ── Pin map (Hardware Reference v4.1 §7) ─────────────────────────────────────
+// ── Pin map (Hardware Reference v5.0) ───────────────────────────────────────────
 
-static constexpr uint8_t PIN_FSR[4]  = {0, 1, 2, 3};  // ADC — FSR1–4
-static constexpr uint8_t PIN_ENN     = 4;               // STEPPER_ENN shared (active LOW)
-static constexpr uint8_t PIN_VBAT    = 5;               // ADC — VBAT_SENSE, 1:2 divider
-static constexpr uint8_t PIN_STEP[3] = {6, 12, 20};    // ACT1 ACT2 ACT3 STEP
-static constexpr uint8_t PIN_DIR[3]  = {7, 13, 21};    // ACT1 ACT2 ACT3 DIR
-static constexpr uint8_t PIN_SDA     = 22;
-static constexpr uint8_t PIN_SCL     = 23;
-static constexpr uint8_t PIN_BUTTON  = 14;              // INPUT_PULLUP, LOW = pressed
-static constexpr uint8_t PIN_CONN    = 9;               // INPUT_PULLDOWN, HIGH = connected
+static constexpr uint8_t PIN_FSR[4]  = {0, 1, 2, 3};   // ADC — FSR1–4
+static constexpr uint8_t PIN_ENN     = 7;                // STEPPER_ENN shared (active LOW)
+static constexpr uint8_t PIN_VBAT    = 6;                // ADC — VBAT_SENSE, 1:2 divider
+static constexpr uint8_t PIN_STEP[3] = {20, 18, 16};    // ACT1 ACT2 ACT3 STEP
+static constexpr uint8_t PIN_DIR[3]  = {19, 14, 17};    // ACT1 ACT2 ACT3 DIR
+static constexpr uint8_t PIN_SDA     = 9;
+static constexpr uint8_t PIN_SCL     = 15;
+static constexpr uint8_t PIN_BUTTON  = 4;               // INPUT_PULLUP, LOW = pressed (boot-safe)
+static constexpr uint8_t PIN_CONN    = 5;               // INPUT_PULLDOWN, HIGH = connected (GPIO5 free)
 
 // ── OLED (0.91" SSD1306 / SH1106 — I2C 0x3C) ────────────────────────────────
 

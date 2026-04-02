@@ -32,7 +32,7 @@ $$I_{RMS} = \frac{V_{REF}}{2.5 \times 0.11} = \frac{V_{REF}}{0.275}$$
 - Multimeter (DC voltage, mV range)
 - Small flat-head screwdriver
 - Motor connected and driver powered (5V_SYS on VM, 3.3V on VIO)
-- ESP32 powered, `STEPPER_ENN` held LOW (drivers enabled) — flash a short sketch that just pulls GPIO4 LOW if needed
+- ESP32 powered, `STEPPER_ENN` held LOW (drivers enabled) — flash a short sketch that just pulls GPIO7 LOW if needed
 
 ---
 
@@ -53,8 +53,8 @@ Flash this minimal enable sketch or use the stepper_test firmware already on the
 
 ```cpp
 // Minimal ENN-enable snippet — paste into setup() for a one-shot test
-pinMode(4, OUTPUT);
-digitalWrite(4, LOW);   // ENN LOW = driver enabled
+pinMode(7, OUTPUT);
+digitalWrite(7, LOW);   // ENN LOW = driver enabled
 ```
 
 ### 4. Measure and adjust

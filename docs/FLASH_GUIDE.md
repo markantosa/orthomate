@@ -87,9 +87,9 @@ Expected output:
 
 ```
 EPD 3D G6 — stepper back-and-forth test
-  STEP pin : GPIO6
-  DIR  pin : GPIO7
-  ENN  pin : GPIO4 (active LOW)
+  STEP pin : GPIO20
+  DIR  pin : GPIO19
+  ENN  pin : GPIO7 (active LOW)
 Driver enabled. Starting motion...
 → Forward  (200 steps)
 ← Reverse  (200 steps)
@@ -120,6 +120,6 @@ After editing, re-upload with the **→ Upload** button.
 |---------|-----|
 | Port not found | Check USB cable, install/reinstall USB driver |
 | Upload times out | Enter manual boot mode (step 3) |
-| Motor does not move | Verify ENN is wired to GPIO 4 and pulled LOW; check VM (5 V) present on TMC2209 |
+| Motor does not move | Verify ENN is wired to GPIO 7 and pulled LOW; check VM (5 V) present on TMC2209 |
 | Motor vibrates but no movement | Swap motor coil pair (OA1↔OA2 or OB1↔OB2) |
 | Overheating driver | Reduce `STEPS_PER_MOVE` / increase `STEP_DELAY_US`; adjust current via trim pot |
