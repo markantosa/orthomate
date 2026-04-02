@@ -1,8 +1,8 @@
-# Pumped Up Kicks V2
+# 🔧 Pumped Up Kicks V2
 
 ## Hardware Design Reference (FINAL)
 
-### Revision V4.0 — Verified GPIO + OLED Integrated
+### **Revision V5.0 — Constrained GPIO (SuperMini) + Routing-Compatible**
 
 ---
 
@@ -31,7 +31,7 @@ Battery-powered adaptive orthopedic insole controller.
 ```
 3.7V LiPo
   │
-  └── TP4056 (charging/protection)
+  └── TP4056
          │
          └── VBAT (3.0–4.2V)
                 │
@@ -46,18 +46,18 @@ Battery-powered adaptive orthopedic insole controller.
 
 ## Rails
 
-| Rail      | Voltage  | Notes         |
-| --------- | -------- | ------------- |
-| VBAT      | 3.0–4.2V | Battery       |
-| 5V_SYS    | 5V       | Boost output  |
-| 3V3_LOGIC | 3.3V     | ESP32 onboard |
-| GND       | 0V       | Common        |
+| Rail   | Voltage  | Notes         |
+| ------ | -------- | ------------- |
+| VBAT   | 3.0–4.2V | Battery       |
+| 5V_SYS | 5V       | Boost output  |
+| 3V3    | 3.3V     | ESP32 onboard |
+| GND    | 0V       | Common        |
 
 ---
 
 ## Critical Rule
 
-> ESP32 MUST be powered from **5V_SYS**, not directly from LiPo.
+> ESP32 MUST be powered from **5V_SYS**, not LiPo directly
 
 ---
 
@@ -65,84 +65,76 @@ Battery-powered adaptive orthopedic insole controller.
 
 TP4056 is **NOT power-path managed**
 
-### System Rule:
+### Rule:
 
 > Charging and actuation must NOT occur simultaneously
 
-### Firmware Requirement:
+### Firmware:
 
-* Detect USB presence
-* Force:
-
-  ```
-  STEPPER_ENN = HIGH (disable drivers)
-  ```
+```
+STEPPER_ENN = HIGH (disable drivers)
+```
 
 ---
 
 # 4. Power Stability
 
-### XL6009 Output
+### XL6009 Output (on PCB)
 
 * 470µF bulk
-* +470–1000µF additional
+* * optional 470–1000µF
 * 100nF ceramic
 
 ### ESP32
 
-* 10µF (3.3V rail)
-* 100nF decoupling
+* 10µF
+* 100nF
 
 ### Per TMC2209
 
-* 100µF electrolytic (VM)
-* 100nF ceramic (VM)
-* 100nF ceramic (VIO)
+* 100µF (VM)
+* 100nF (VM)
+* 100nF (VIO)
 
 ---
 
 # 5. Battery Monitoring
 
 ```
-VBAT ── 100k ──+──→ GPIO5 (ADC)
+VBAT ── 100k ──+──→ GPIO6 (ADC)
                |
               100k
                |
               GND
 ```
 
-### Firmware thresholds:
+---
 
-* <3.5V → warning
-* <3.3–3.4V → disable motors
-* <3.2V → shutdown
+# 6. FINAL ESP32-C6 PIN ASSIGNMENT (UPDATED)
+
+## ⚠️ Constraint-aware mapping (SuperMini breakout)
 
 ---
 
-# 6. FINAL ESP32-C6 Pin Assignment
+## Analog Inputs (ADC-safe zone)
 
-## ✅ Verified + Board-Compatible
-
----
-
-## Analog Inputs (FSR)
-
-| Function        | GPIO  |
-| --------------- | ----- |
-| FSR1_METATARSAL | GPIO0 |
-| FSR2_ARCH       | GPIO1 |
-| FSR3_CALCANEUS  | GPIO2 |
-| FSR4_AUX        | GPIO3 |
+| Function   | GPIO  |
+| ---------- | ----- |
+| FSR1       | GPIO0 |
+| FSR2       | GPIO1 |
+| FSR3       | GPIO2 |
+| FSR4       | GPIO3 |
+| VBAT_SENSE | GPIO6 |
 
 ---
 
-## Stepper Control (TMC2209)
+## Stepper Control
 
 | Actuator | STEP   | DIR    |
 | -------- | ------ | ------ |
-| ACT1     | GPIO6  | GPIO7  |
-| ACT2     | GPIO12 | GPIO13 |
-| ACT3     | GPIO20 | GPIO21 |
+| ACT1     | GPIO20 | GPIO19 |
+| ACT2     | GPIO18 | GPIO14 |
+| ACT3     | GPIO16 | GPIO17 |
 
 ---
 
@@ -150,34 +142,38 @@ VBAT ── 100k ──+──→ GPIO5 (ADC)
 
 | Function    | GPIO  |
 | ----------- | ----- |
-| STEPPER_ENN | GPIO4 |
+| STEPPER_ENN | GPIO7 |
 
 ---
 
-## Battery Sense
-
-| Function   | GPIO  |
-| ---------- | ----- |
-| VBAT_SENSE | GPIO5 |
-
----
-
-## OLED Display (I2C)
+## OLED (I2C)
 
 | Signal | GPIO   |
 | ------ | ------ |
-| SDA    | GPIO22 |
-| SCL    | GPIO23 |
+| SDA    | GPIO9  |
+| SCL    | GPIO15 |
 
 ---
 
-## ⚠️ Restricted Pins
+## User Input
 
-| Pin       | Reason                       |
-| --------- | ---------------------------- |
-| GPIO8     | Connected to onboard RGB LED |
-| GPIO10/11 | Not broken out               |
-| GPIO15    | Boot strap                   |
+| Function     | GPIO  |
+| ------------ | ----- |
+| MODE_BTN     | GPIO4 |
+| CONN_DETECT  | GPIO5 |
+
+---
+
+## ⚠️ Pin Notes (IMPORTANT)
+
+| Pin       | Note                                            |
+| --------- | ----------------------------------------------- |
+| GPIO4     | Strapping pin → button must NOT be held at boot |
+| GPIO9     | Strapping → OK for I2C (pull-up safe)           |
+| GPIO15    | Strapping → OK for I2C                          |
+| GPIO16/17 | UART default → now used for STEP/DIR            |
+| GPIO8     | Avoid (often onboard LED)                       |
+| GPIO5     | CONN_DETECT — INPUT_PULLDOWN, HIGH = connected   |
 
 ---
 
@@ -194,7 +190,7 @@ VBAT ── 100k ──+──→ GPIO5 (ADC)
 ### Control
 
 * STEP / DIR → ESP32
-* ENN → shared GPIO4
+* ENN → GPIO7 (shared)
 
 ### Motor Outputs
 
@@ -234,38 +230,14 @@ At ADC:
 
 ---
 
-## Notes
-
-* Powered from 3.3V ONLY
-* RC filtering REQUIRED
-
----
-
-# 9. OLED Display Integration
-
-## Display
-
-* 0.91" OLED (SSD1306 / SH1106)
-* Interface: I2C
-
----
-
-## Wiring
+# 9. OLED Display
 
 | OLED | ESP32  |
 | ---- | ------ |
-| VCC  | 3.3V   |
+| VCC  | 3V3    |
 | GND  | GND    |
-| SDA  | GPIO22 |
-| SCL  | GPIO23 |
-
----
-
-## Notes
-
-* Pull-ups usually onboard (4.7k–10k)
-* No additional GPIO required
-* Place near logic section (Zone C)
+| SDA  | GPIO9  |
+| SCL  | GPIO15 |
 
 ---
 
@@ -273,25 +245,15 @@ At ADC:
 
 ## J_MAIN (20-pin)
 
-### Pins
-
-1. 3V3_SENSE
-2. 5V_SYS
-3. GND
-4. GND
-
-5–8. FSR1–4
-
-9–12. ACT1 coils
-13–16. ACT2 coils
-17–20. ACT3 coils
-
----
-
-## Notes
-
-* Dual GND mandatory
-* Keep return paths short
+| Pins  | Function  |
+| ----- | --------- |
+| 1     | 3V3_SENSE |
+| 2     | 5V_SYS    |
+| 3–4   | GND       |
+| 5–8   | FSR1–4    |
+| 9–12  | ACT1      |
+| 13–16 | ACT2      |
+| 17–20 | ACT3      |
 
 ---
 
@@ -315,27 +277,22 @@ At ADC:
 * FSR circuits
 * OLED
 
----
-
-> Zone C must be farthest from boost + motors
+> Keep Zone C far from boost + motors 
 
 ---
 
 # 12. Ground Strategy
 
-**Trunk + Branch topology**
+**Trunk + Branch**
 
 * Battery GND = origin
+* Separate:
 
-Branches:
+  * Power return
+  * Logic return
+  * Analog return
 
-* High current (boost + motors)
-* Logic (ESP32)
-* Analog (FSR)
-
----
-
-> NEVER mix motor return with analog ground
+> NEVER mix motor return with analog ground 
 
 ---
 
@@ -344,8 +301,8 @@ Branches:
 1. Power
 2. Motor outputs
 3. STEP/DIR
-4. Analog (FSR)
-5. I2C (OLED)
+4. Analog
+5. I2C
 
 ---
 
@@ -360,9 +317,9 @@ Branches:
 
 ---
 
-# 14. Boost Converter Layout
+# 14. Boost Layout Rules
 
-* Keep far from FSR + OLED
+* Keep far from analog
 * Minimize loop area
 * Thick traces
 * Treat as **noise source**
@@ -373,34 +330,27 @@ Branches:
 
 ## Motion
 
-* Do NOT start all motors simultaneously
-* Delay: 50–100 ms between motors
-* Prefer sequential actuation
+* Do NOT start all motors at once
+* Delay 50–100 ms
 
----
+## ADC
 
-## ADC Sampling
+* Sample when motors idle OR median filter
 
-* Sample when motors idle OR
-* Use median filter (≥5 samples)
+## OLED
 
----
-
-## Display Updates
-
-* Update OLED at low frequency (5–10 Hz)
-* Avoid updates during motor spikes
+* 5–10 Hz update
+* Avoid switching spikes
 
 ---
 
 # 16. Bring-Up Sequence
 
 1. Power only
-2. Validate 3.3V + ADC
+2. Validate ADC + 3.3V
 3. Test OLED
-4. Test 1 TMC
-5. Test 1 actuator
-6. Scale gradually
+4. Test 1 driver
+5. Scale
 
 ---
 
@@ -408,23 +358,20 @@ Branches:
 
 ## R1 — FSR Noise
 
-* RC filtering
+* RC filter
 * zoning
-* sampling strategy
 
-## R2 — Power Instability
+## R2 — Power instability
 
 * bulk caps
-* staged motor control
 
-## R3 — Charging Conflict
+## R3 — Charging conflict
 
 * firmware lockout
 
-## R4 — EMI (NEW from OLED)
+## R4 — Boot issues (NEW)
 
-* keep I2C short
-* isolate from boost
+* avoid pulling GPIO4 during boot
 
 ---
 
@@ -436,17 +383,28 @@ Branches:
 
 ---
 
-# 19. Final System Summary
+# 19. Final Summary
 
 * 1S LiPo
-* TP4056 (charging-only mode)
+* TP4056
 * XL6009 → 5V_SYS
-* ESP32-C6 powered from 5V
+* ESP32-C6 (limited GPIO map)
 * 3× TMC2209
-* 4× FSR (3.3V dividers)
-* **0.91" OLED (I2C)**
-* 20-pin connector
+* 4× FSR (ADC0–3)
+* OLED (GPIO9/15)
+* Shared ENN (GPIO7)
+* Button on GPIO4 (boot-safe usage)
+* Connector detect on GPIO5 (INPUT_PULLDOWN)
 * Single-layer PCB
-* Strict zoning + grounding
 
+---
 
+# 🧠 What changed (important insight)
+
+This new version is:
+
+* **pin-constrained but valid**
+* **boot-safe (if used correctly)**
+* **still routable single-layer (with good placement)**
+
+---

@@ -40,7 +40,7 @@ static constexpr uint8_t PIN_DIR[3]  = {19, 14, 17};    // ACT1 ACT2 ACT3 DIR
 static constexpr uint8_t PIN_SDA     = 9;
 static constexpr uint8_t PIN_SCL     = 15;
 static constexpr uint8_t PIN_BUTTON  = 4;               // INPUT_PULLUP, LOW = pressed (boot-safe)
-static constexpr uint8_t PIN_CONN    = 5;               // INPUT_PULLDOWN, HIGH = connected (GPIO5 free)
+static constexpr uint8_t PIN_CONN    = 5;               // INPUT_PULLDOWN, HIGH = connected
 
 // ── OLED (0.91" SSD1306 / SH1106 — I2C 0x3C) ────────────────────────────────
 
