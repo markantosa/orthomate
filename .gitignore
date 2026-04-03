@@ -16,10 +16,11 @@ Thumbs.db
 *~
 *.bak
 
-# KiCad auto-save, lock, backup, and cache files
+# KiCad auto-save, lock, backup, cache, and local history
 **/\#auto_saved_files\#
 **/_autosave-*
 **/*.lck
 **/*.kicad_sch-bak
 **/*-backups/
 **/fp-info-cache
+**/.history/
