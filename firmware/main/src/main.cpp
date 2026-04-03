@@ -74,7 +74,8 @@ enum State : uint8_t {
     ST_MEASURING,   // reading FSR channels
     ST_MEASURED,    // measurement stored — waiting for second button press
     ST_ACTUATING,   // driving actuators to computed targets
-    ST_DONE         // actuation complete — waiting for third button press (retract)
+    ST_DONE,        // actuation complete — insole shaped, user disconnects to use
+    ST_HOMING       // reconnected with actuators extended — retract before new cycle
 };
 
 static State   gState     = ST_DISCON;
@@ -319,16 +320,19 @@ void loop() {
 
     // ── Connector removal — disable immediately, any state ───────────────────
     if (!conn && gState != ST_DISCON) {
-        digitalWrite(PIN_ENN, HIGH);              // cut motor power immediately
-        for (int i = 0; i < 3; i++) gPos[i] = 0; // position tracking reset
+        digitalWrite(PIN_ENN, HIGH);   // cut motor power immediately
+        // gPos is intentionally NOT reset — position is remembered across
+        // plug/unplug so homing is triggered correctly on reconnect
         gState = ST_DISCON;
         Serial.println("[CONN] Removed");
     }
 
     // ── Connector re-attach ──────────────────────────────────────────────────
     if (conn && gState == ST_DISCON) {
-        gState = ST_CONN;
-        Serial.println("[CONN] Attached");
+        bool needsHome = false;
+        for (int i = 0; i < 3; i++) if (gPos[i] != 0) { needsHome = true; break; }
+        gState = needsHome ? ST_HOMING : ST_CONN;
+        Serial.printf("[CONN] Attached — %s\n", needsHome ? "homing first" : "ready");
     }
 
     // ── State machine ────────────────────────────────────────────────────────
@@ -376,19 +380,24 @@ void loop() {
             gState = ST_DONE;
             break;
 
-        // ── Holding extension, wait for reset ─────────────────────────────────
+        // ── Insole shaped — user disconnects to use ──────────────────────────
         case ST_DONE: {
             char l2[33];
             snprintf(l2, sizeof(l2), "Ext:%d %d %d stp",
                      (int)gPos[0], (int)gPos[1], (int)gPos[2]);
-            showOLED("ACTUATION DONE", l2, "Btn: retract+reset");
-            if (btn) {
-                showOLED("RETRACTING...");
-                retractAll();
-                gState = ST_CONN; // ready for next cycle
-            }
+            showOLED("INSOLE SHAPED", l2, "Disconnect to use");
+            // No button action — user simply unplugs the connector.
+            // On next reconnect, ST_HOMING will retract before new cycle.
             break;
         }
+
+        // ── Auto-home on reconnect with actuators extended ────────────────────
+        case ST_HOMING:
+            showOLED("HOMING...", "Retracting all", "Please wait");
+            retractAll(); // drives all axes to 0 and sets gPos[i]=0, ENN→HIGH
+            gState = ST_CONN;
+            Serial.println("[HOME] Complete");
+            break;
     }
 
     delay(50); // ~20 Hz main loop rate
