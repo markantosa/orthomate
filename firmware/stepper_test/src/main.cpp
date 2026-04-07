@@ -22,8 +22,8 @@ static constexpr uint8_t PIN_ENN  = 7;   // STEPPER_ENN_SHARED (active LOW)
 
 // ── Motion parameters ────────────────────────────────────────────────────────
 // Adjust STEPS_PER_MOVE and STEP_DELAY_US to match your actuator travel.
-static constexpr uint32_t STEPS_PER_MOVE  = 200;   // steps per direction pass
-static constexpr uint32_t STEP_DELAY_US   = 1500;  // µs between step pulses → ~333 steps/s
+static constexpr uint32_t STEPS_PER_MOVE  = 7680;  // ~12mm travel (scaled from 3200 steps = 5mm)
+static constexpr uint32_t STEP_DELAY_US   = 600;   // µs between step pulses → ~1600 steps/s
 static constexpr uint32_t STEP_PULSE_US   = 5;     // µs HIGH pulse width (TMC2209 min ≥ 100 ns)
 static constexpr uint32_t PAUSE_MS        = 500;   // pause between direction changes
 

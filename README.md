@@ -27,7 +27,10 @@ pumped-up-kicks/
 │   ├── main/                   # Full operational firmware (PlatformIO)
 │   │   ├── platformio.ini
 │   │   └── src/main.cpp
-│   └── stepper_test/           # Single-axis stepper smoke test
+│   ├── stepper_test/           # Single-axis stepper back-and-forth smoke test
+│   │   ├── platformio.ini
+│   │   └── src/main.cpp
+│   └── homing_test/            # Blind homing: retract to min, extend to 12 mm
 │       ├── platformio.ini
 │       └── src/main.cpp
 ├── kicad pcb/                  # KiCad schematic + layout files

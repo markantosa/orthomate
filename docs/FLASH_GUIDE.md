@@ -13,7 +13,10 @@
 ## 1. Open the project
 
 1. Launch VS Code.
-2. **File → Open Folder** → select `firmware/stepper_test/`.  
+2. **File → Open Folder** → select the firmware subfolder you want to flash:  
+   - `firmware/stepper_test/` — back-and-forth motion smoke test  
+   - `firmware/homing_test/` — blind homing sequence (retract → min, extend → 12 mm)  
+   - `firmware/main/` — full operational firmware  
    PlatformIO detects `platformio.ini` and automatically installs the **Espressif32** platform and toolchain on first open (takes 1–3 minutes).
 
 ---
@@ -83,7 +86,7 @@ Baud rate: **115200**.
 pio device monitor --baud 115200
 ```
 
-Expected output:
+Expected output (stepper_test):
 
 ```
 EPD 3D G6 — stepper back-and-forth test
@@ -91,24 +94,47 @@ EPD 3D G6 — stepper back-and-forth test
   DIR  pin : GPIO19
   ENN  pin : GPIO7 (active LOW)
 Driver enabled. Starting motion...
-→ Forward  (200 steps)
-← Reverse  (200 steps)
-→ Forward  (200 steps)
+→ Forward  (7680 steps)
+← Reverse  (7680 steps)
+→ Forward  (7680 steps)
 ...
+```
+
+Expected output (homing_test):
+
+```
+EPD 3D G6 — homing test
+  STEP : GPIO20  DIR : GPIO19  ENN : GPIO7
+Homing: retracting to min extension...
+Homed. Position = 0 (min extension)
+Extending to max (18432 steps = 12mm, 1536 steps/mm)...
+At max extension. Done.
 ```
 
 ---
 
 ## 6. Tuning motion parameters
 
+### stepper_test
+
 Edit the constants at the top of `src/main.cpp`:
 
-| Constant | Default | Effect |
-|----------|---------|--------|
-| `STEPS_PER_MOVE` | `200` | Steps per direction pass |
-| `STEP_DELAY_US` | `1500` | Delay between pulses (lower = faster) |
+| Constant | Current value | Effect |
+|----------|--------------|--------|
+| `STEPS_PER_MOVE` | `7680` | Steps per direction pass (~5 mm) |
+| `STEP_DELAY_US` | `600` | Delay between pulses (lower = faster, ~1600 steps/s) |
 | `STEP_PULSE_US` | `5` | Step pulse HIGH width (keep ≥ 1 µs) |
 | `PAUSE_MS` | `500` | Pause between direction changes |
+
+### homing_test
+
+| Constant | Current value | Effect |
+|----------|--------------|--------|
+| `STEPS_PER_MM` | `1536` | Calibrated steps per mm |
+| `STEPS_FULL_TRAVEL` | `18432` | Full 12 mm stroke (1536 × 12) |
+| `STEPS_HOME_OVERSHOOT` | `22000` | Overdrive steps for guaranteed end stop contact |
+| `STEP_HOME_DELAY` | `600` | Homing speed delay µs (~1600 steps/s) |
+| `STEP_NORMAL_DELAY` | `300` | Extension speed delay µs (~3200 steps/s) |
 
 After editing, re-upload with the **→ Upload** button.
 
