@@ -16,6 +16,9 @@ Thumbs.db
 *~
 *.bak
 
+# KiCad project folder (kept locally only — gerbers exported to V2 PCB/)
+kicad pcb/
+
 # KiCad auto-save, lock, backup, cache, and local history
 **/\#auto_saved_files\#
 **/_autosave-*
