@@ -61,7 +61,7 @@ CONNECTED  ──[btn]──►  MEASURING  ──(auto)──►  MEASURED
 
 Extension formula: $ext_i \propto (1 - r_i)$ where $r_i = F_i / \sum F$
 
-## GPIO assignment (ESP32-C6 SuperMini, v5.0)
+## GPIO assignment (ESP32-C6 SuperMini, v6.0)
 
 | GPIO | Function |
 |------|----------|
@@ -70,11 +70,11 @@ Extension formula: $ext_i \propto (1 - r_i)$ where $r_i = F_i / \sum F$
 | 2 | FSR3 CALCANEUS (ADC) |
 | 3 | FSR4 AUX (ADC) |
 | 4 | MODE\_BUTTON (INPUT\_PULLUP) — boot-safe usage |
-| 6 | VBAT\_SENSE (ADC) |
-| 7 | STEPPER\_ENN\_SHARED (active LOW) |
-| 9 | OLED SDA (I2C) |
+| 5 | CONN\_DETECT (INPUT\_PULLDOWN) |
+| 6 | OLED SCL (I2C) |
+| 7 | OLED SDA (I2C) |
 | 14 | ACT2\_DIR |
-| 15 | OLED SCL (I2C) |
+| 15 | VBAT\_SENSE ⚠️ not ADC-capable on ESP32-C6 |
 | 16 | ACT3\_STEP |
 | 17 | ACT3\_DIR |
 | 18 | ACT2\_STEP |

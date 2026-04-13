@@ -2,7 +2,7 @@
 
 ## Hardware Design Reference (FINAL)
 
-### **Revision V5.0 — Constrained GPIO (SuperMini) + Routing-Compatible**
+### **Revision V6.0 — ENN hardwired, OLED GPIO6/7, VBAT GPIO15, new J9 connector layout**
 
 ---
 
@@ -101,12 +101,16 @@ STEPPER_ENN = HIGH (disable drivers)
 # 5. Battery Monitoring
 
 ```
-VBAT ── 100k ──+──→ GPIO6 (ADC)
+VBAT ── 100k ──+──→ GPIO15
                |
               100k
                |
               GND
 ```
+
+> ⚠️ **GPIO15 is NOT ADC-capable on ESP32-C6** (ADC1 covers GPIO0–GPIO6 only).
+> Battery voltage monitoring via firmware ADC **will not function** at this pin.
+> Consider routing to an unused GPIO0–GPIO6 pin, or adding an external I2C ADC.
 
 ---
 
@@ -124,7 +128,14 @@ VBAT ── 100k ──+──→ GPIO6 (ADC)
 | FSR2       | GPIO1 |
 | FSR3       | GPIO2 |
 | FSR4       | GPIO3 |
-| VBAT_SENSE | GPIO6 |
+
+---
+
+## VBAT Monitor
+
+| Function   | GPIO   | Note                                                      |
+| ---------- | ------ | --------------------------------------------------------- |
+| VBAT_SENSE | GPIO15 | ⚠️ NOT ADC-capable on ESP32-C6 — voltage divider present but unreadable via firmware ADC |
 
 ---
 
@@ -138,20 +149,19 @@ VBAT ── 100k ──+──→ GPIO6 (ADC)
 
 ---
 
-## Shared Control
+## ENN (Shared Enable)
 
-| Function    | GPIO  |
-| ----------- | ----- |
-| STEPPER_ENN | GPIO7 |
+All TMC2209 ENN pins are **hardwired to GND on the PCB** (always enabled).
+No firmware GPIO required.
 
 ---
 
 ## OLED (I2C)
 
-| Signal | GPIO   |
-| ------ | ------ |
-| SDA    | GPIO9  |
-| SCL    | GPIO15 |
+| Signal | GPIO  |
+| ------ | ----- |
+| SDA    | GPIO7 |
+| SCL    | GPIO6 |
 
 ---
 
@@ -166,14 +176,15 @@ VBAT ── 100k ──+──→ GPIO6 (ADC)
 
 ## ⚠️ Pin Notes (IMPORTANT)
 
-| Pin       | Note                                            |
-| --------- | ----------------------------------------------- |
-| GPIO4     | Strapping pin → button must NOT be held at boot |
-| GPIO9     | Strapping → OK for I2C (pull-up safe)           |
-| GPIO15    | Strapping → OK for I2C                          |
-| GPIO16/17 | UART default → now used for STEP/DIR            |
-| GPIO8     | Avoid (often onboard LED)                       |
-| GPIO5     | CONN_DETECT — INPUT_PULLDOWN (internal ~45k); loopback via insole 10k; no external pulldown needed |
+| Pin       | Note                                                                                                  |
+| --------- | ----------------------------------------------------------------------------------------------------- |
+| GPIO4     | Strapping pin → button must NOT be held at boot                                                       |
+| GPIO6     | OLED SCL — strapping-safe, pull-up OK                                                                 |
+| GPIO7     | OLED SDA (previously STEPPER_ENN)                                                                     |
+| GPIO15    | VBAT_SENSE — ⚠️ NOT ADC-capable on ESP32-C6; voltage divider connected but firmware cannot read it   |
+| GPIO16/17 | UART default → now used for STEP/DIR                                                                  |
+| GPIO8     | Avoid (often onboard LED)                                                                             |
+| GPIO5     | CONN_DETECT — INPUT_PULLDOWN (internal ~45k); loopback via insole 10k; no external pulldown needed    |
 
 ---
 
@@ -190,7 +201,7 @@ VBAT ── 100k ──+──→ GPIO6 (ADC)
 ### Control
 
 * STEP / DIR → ESP32
-* ENN → GPIO7 (shared)
+* ENN → **GND (hardwired on PCB)** — always enabled; no firmware GPIO required
 
 ### Motor Outputs
 
@@ -236,8 +247,8 @@ At ADC:
 | ---- | ------ |
 | VCC  | 3V3    |
 | GND  | GND    |
-| SDA  | GPIO9  |
-| SCL  | GPIO15 |
+| SDA  | GPIO7  |
+| SCL  | GPIO6  |
 
 ---
 
@@ -252,16 +263,16 @@ At ADC:
 
 | Row | Pin A (odd) | Signal A    | Signal B     | Pin B (even) |
 | --- | ----------- | ----------- | ------------ | ------------ |
-| 1   | 1           | 3V3_SENSE   | CONN_DETECT  | 2            |
-| 2   | 3           | GND         | GND          | 4            |
-| 3   | 5           | FSR1        | FSR2        | 6            |
-| 4   | 7           | FSR3        | FSR4        | 8            |
-| 5   | 9           | ACT1_OA1    | ACT1_OA2    | 10           |
-| 6   | 11          | ACT1_OB1    | ACT1_OB2    | 12           |
-| 7   | 13          | ACT2_OA1    | ACT2_OA2    | 14           |
-| 8   | 15          | ACT2_OB1    | ACT2_OB2    | 16           |
-| 9   | 17          | ACT3_OA1    | ACT3_OA2    | 18           |
-| 10  | 19          | ACT3_OB1    | ACT3_OB2    | 20           |
+| 1   | 1           | ACT1_OA2    | GND          | 2            |
+| 2   | 3           | ACT1_OA1    | GND          | 4            |
+| 3   | 5           | ACT1_OB1    | 3V3          | 6            |
+| 4   | 7           | ACT1_OB2    | CONN_DETECT  | 8            |
+| 5   | 9           | ACT2_OA2    | FSR4         | 10           |
+| 6   | 11          | ACT2_OA1    | FSR3         | 12           |
+| 7   | 13          | ACT2_OB1    | FSR2         | 14           |
+| 8   | 15          | ACT2_OB2    | FSR1         | 16           |
+| 9   | 17          | ACT3_OA2    | ACT3_OB2     | 18           |
+| 10  | 19          | ACT3_OA1    | ACT3_OB1     | 20           |
 
 ### Per-pin reference
 
@@ -269,11 +280,11 @@ At ADC:
 
 ```
 Controller PCB:         Insole PCB:
-pin 1 (3V3_SENSE) ──────────── 10k ──── pin 2 (CONN_DETECT)
-                                              │
-                                         GPIO5 (INPUT_PULLDOWN, ~45k internal)
-                                              │
-                                             GND
+pin 6 (3V3) ──────────── 10k ──── pin 8 (CONN_DETECT)
+                                        │
+                                   GPIO5 (INPUT_PULLDOWN, ~45k internal)
+                                        │
+                                       GND
 ```
 
 * Unplugged → GPIO5 pulled LOW by internal pulldown → CONN_DETECT = 0
@@ -283,28 +294,28 @@ pin 1 (3V3_SENSE) ──────────── 10k ──── pin 2 (C
 
 ### Per-pin reference
 
-| Pin | Signal       | Notes                                                  |
-| --- | ------------ | ------------------------------------------------------ |
-| 1   | 3V3_SENSE    | Source for loopback detect; drives insole 10k          |
-| 2   | CONN_DETECT  | → GPIO5 (INPUT_PULLDOWN); HIGH = insole connected      |
-| 3   | GND       | Power return                                   |
-| 4   | GND       | Power return                                   |
-| 5   | FSR1      | → GPIO0 (ADC)                                  |
-| 6   | FSR2      | → GPIO1 (ADC)                                  |
-| 7   | FSR3      | → GPIO2 (ADC)                                  |
-| 8   | FSR4      | → GPIO3 (ADC)                                  |
-| 9   | ACT1_OA1  | TMC2209 OA1 → ACT1 coil A+                     |
-| 10  | ACT1_OA2  | TMC2209 OA2 → ACT1 coil A−                     |
-| 11  | ACT1_OB1  | TMC2209 OB1 → ACT1 coil B+                     |
-| 12  | ACT1_OB2  | TMC2209 OB2 → ACT1 coil B−                     |
-| 13  | ACT2_OA1  | TMC2209 OA1 → ACT2 coil A+                     |
-| 14  | ACT2_OA2  | TMC2209 OA2 → ACT2 coil A−                     |
-| 15  | ACT2_OB1  | TMC2209 OB1 → ACT2 coil B+                     |
-| 16  | ACT2_OB2  | TMC2209 OB2 → ACT2 coil B−                     |
-| 17  | ACT3_OA1  | TMC2209 OA1 → ACT3 coil A+                     |
-| 18  | ACT3_OA2  | TMC2209 OA2 → ACT3 coil A−                     |
-| 19  | ACT3_OB1  | TMC2209 OB1 → ACT3 coil B+                     |
-| 20  | ACT3_OB2  | TMC2209 OB2 → ACT3 coil B−                     |
+| Pin | Signal       | Notes                                                      |
+| --- | ------------ | ---------------------------------------------------------- |
+| 1   | ACT1_OA2     | TMC2209 OA2 → ACT1 coil A−                                |
+| 2   | GND          | Power return                                               |
+| 3   | ACT1_OA1     | TMC2209 OA1 → ACT1 coil A+                                |
+| 4   | GND          | Power return                                               |
+| 5   | ACT1_OB1     | TMC2209 OB1 → ACT1 coil B+                                |
+| 6   | 3V3          | Source for loopback detect; drives insole 10k              |
+| 7   | ACT1_OB2     | TMC2209 OB2 → ACT1 coil B−                                |
+| 8   | CONN_DETECT  | → GPIO5 (INPUT_PULLDOWN); HIGH = insole connected          |
+| 9   | ACT2_OA2     | TMC2209 OA2 → ACT2 coil A−                                |
+| 10  | FSR4         | → GPIO3 (ADC)                                              |
+| 11  | ACT2_OA1     | TMC2209 OA1 → ACT2 coil A+                                |
+| 12  | FSR3         | → GPIO2 (ADC)                                              |
+| 13  | ACT2_OB1     | TMC2209 OB1 → ACT2 coil B+                                |
+| 14  | FSR2         | → GPIO1 (ADC)                                              |
+| 15  | ACT2_OB2     | TMC2209 OB2 → ACT2 coil B−                                |
+| 16  | FSR1         | → GPIO0 (ADC)                                              |
+| 17  | ACT3_OA2     | TMC2209 OA2 → ACT3 coil A−                                |
+| 18  | ACT3_OB2     | TMC2209 OB2 → ACT3 coil B−                                |
+| 19  | ACT3_OA1     | TMC2209 OA1 → ACT3 coil A+                                |
+| 20  | ACT3_OB1     | TMC2209 OB1 → ACT3 coil B+                                |
 
 ---
 

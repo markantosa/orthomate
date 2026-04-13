@@ -1,7 +1,7 @@
 # Firmware — `firmware/main` Explained
 
 **File:** `firmware/main/src/main.cpp`
-**Hardware ref:** v5.0
+**Hardware ref:** v6.0
 
 ---
 
@@ -62,11 +62,11 @@ If any actuator has a non-zero tracked position, the firmware goes to `ST_HOMING
 
 **Circuit:**
 ```
-J_MAIN pin 1 (3V3_SENSE) ── insole 10 kΩ ──► pin 2 (CONN_DETECT) ──► GPIO5
-                                                                         │
-                                                               INPUT_PULLDOWN (~45 kΩ internal)
-                                                                         │
-                                                                        GND
+J_MAIN pin 6 (3V3) ── insole 10 kΩ ──► pin 8 (CONN_DETECT) ──► GPIO5
+                                                                     │
+                                                           INPUT_PULLDOWN (~45 kΩ internal)
+                                                                     │
+                                                                    GND
 ```
 
 **Logic:**
@@ -139,7 +139,10 @@ FSR2 has the lowest load → ACT2 extends the most.
 
 ## 5. Battery monitoring
 
-**Circuit:** 1:2 resistor divider (100 kΩ / 100 kΩ) on VBAT → GPIO6
+**Circuit:** 1:2 resistor divider (100 kΩ / 100 kΩ) on VBAT → GPIO15
+
+> ⚠️ **GPIO15 is NOT ADC-capable on ESP32-C6** (ADC1 covers GPIO0–GPIO6 only).
+> The divider is present on the PCB but `PIN_VBAT` must be reassigned to an ADC-capable pin for this function to work.
 
 $$V_{\text{BAT}} = \frac{\text{ADC count}}{4095} \times 3.3\,\text{V} \times 2$$
 
@@ -221,6 +224,8 @@ falling edge detected (LOW) + !gLastBtn + Δt > BTN_DEBOUNCE_MS (30 ms)
 `showOLED(r1, r2, r3)` draws up to 3 rows on the 128×32 SSD1306. It includes a **content cache** — if all three strings match the previous call, no I2C transaction is issued. This prevents unnecessary bus activity during motor current pulses.
 
 The display is non-critical: `gOledOk` is checked at the start of every call, so firmware continues normally if no OLED is detected.
+
+I2C bus: SDA = GPIO7, SCL = GPIO6.
 
 ---
 

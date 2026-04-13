@@ -92,7 +92,7 @@ Expected output (stepper_test):
 EPD 3D G6 — stepper back-and-forth test
   STEP pin : GPIO20
   DIR  pin : GPIO19
-  ENN  pin : GPIO7 (active LOW)
+  ENN  pin : GND (hardwired on PCB)
 Driver enabled. Starting motion...
 → Forward  (7680 steps)
 ← Reverse  (7680 steps)
@@ -104,7 +104,7 @@ Expected output (homing_test):
 
 ```
 EPD 3D G6 — homing test
-  STEP : GPIO20  DIR : GPIO19  ENN : GPIO7
+  STEP : GPIO20  DIR : GPIO19  ENN : GND (hardwired)
 Homing: retracting to min extension...
 Homed. Position = 0 (min extension)
 Extending to max (18432 steps = 12mm, 1536 steps/mm)...
@@ -146,6 +146,6 @@ After editing, re-upload with the **→ Upload** button.
 |---------|-----|
 | Port not found | Check USB cable, install/reinstall USB driver |
 | Upload times out | Enter manual boot mode (step 3) |
-| Motor does not move | Verify ENN is wired to GPIO 7 and pulled LOW; check VM (5 V) present on TMC2209 |
+| Motor does not move | Verify ENN is hardwired to GND on PCB; check VM (5 V) present on TMC2209 |
 | Motor vibrates but no movement | Swap motor coil pair (OA1↔OA2 or OB1↔OB2) |
 | Overheating driver | Reduce `STEPS_PER_MOVE` / increase `STEP_DELAY_US`; adjust current via trim pot |

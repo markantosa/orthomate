@@ -48,14 +48,9 @@ Place the negative probe on the **GND pad** of the module (not the motor coil pi
 
 ### 3. Enable the driver
 
-The driver must be powered and `ENN` must be LOW for VREF to be valid.  
-Flash this minimal enable sketch or use the stepper_test firmware already on the board:
+The driver must be powered and `ENN` must be LOW for VREF to be valid.
 
-```cpp
-// Minimal ENN-enable snippet — paste into setup() for a one-shot test
-pinMode(7, OUTPUT);
-digitalWrite(7, LOW);   // ENN LOW = driver enabled
-```
+> From **v6.0 PCB onward, ENN is hardwired to GND on the PCB** — the driver is always enabled when powered. No firmware sketch is needed; simply power the system (5V_SYS present, ESP32 running).
 
 ### 4. Measure and adjust
 
