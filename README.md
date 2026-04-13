@@ -70,11 +70,11 @@ Extension formula: $ext_i \propto (1 - r_i)$ where $r_i = F_i / \sum F$
 | 2 | FSR3 CALCANEUS (ADC) |
 | 3 | FSR4 AUX (ADC) |
 | 4 | MODE\_BUTTON (INPUT\_PULLUP) — boot-safe usage |
-| 5 | CONN\_DETECT (INPUT\_PULLDOWN) |
+| 5 | VBAT\_SENSE (ADC1 ch5) |
 | 6 | OLED SCL (I2C) |
 | 7 | OLED SDA (I2C) |
 | 14 | ACT2\_DIR |
-| 15 | VBAT\_SENSE ⚠️ not ADC-capable on ESP32-C6 |
+| 15 | CONN\_DETECT (INPUT\_PULLDOWN) |
 | 16 | ACT3\_STEP |
 | 17 | ACT3\_DIR |
 | 18 | ACT2\_STEP |

@@ -62,7 +62,7 @@ If any actuator has a non-zero tracked position, the firmware goes to `ST_HOMING
 
 **Circuit:**
 ```
-J_MAIN pin 6 (3V3) ── insole 10 kΩ ──► pin 8 (CONN_DETECT) ──► GPIO5
+J_MAIN pin 6 (3V3) ── insole 10 kΩ ──► pin 8 (CONN_DETECT) ──► GPIO15
                                                                      │
                                                            INPUT_PULLDOWN (~45 kΩ internal)
                                                                      │
@@ -70,7 +70,7 @@ J_MAIN pin 6 (3V3) ── insole 10 kΩ ──► pin 8 (CONN_DETECT) ──► 
 ```
 
 **Logic:**
-- Unplugged: GPIO5 pulled LOW by internal ~45 kΩ → `connPresent() = false`
+- Unplugged: GPIO15 pulled LOW by internal ~45 kΩ → `connPresent() = false`
 - Plugged in: 3.3 V through insole 10 kΩ + internal 45 kΩ divider → V ≈ 2.7 V → `connPresent() = true`
 - No external resistor needed on the controller PCB
 
@@ -139,10 +139,9 @@ FSR2 has the lowest load → ACT2 extends the most.
 
 ## 5. Battery monitoring
 
-**Circuit:** 1:2 resistor divider (100 kΩ / 100 kΩ) on VBAT → GPIO15
+**Circuit:** 1:2 resistor divider (100 kΩ / 100 kΩ) on VBAT → GPIO5 (ADC1 ch5)
 
-> ⚠️ **GPIO15 is NOT ADC-capable on ESP32-C6** (ADC1 covers GPIO0–GPIO6 only).
-> The divider is present on the PCB but `PIN_VBAT` must be reassigned to an ADC-capable pin for this function to work.
+$$V_{\text{BAT}} = \frac{\text{ADC count}}{4095} \times 3.3\,\text{V} \times 2$$
 
 $$V_{\text{BAT}} = \frac{\text{ADC count}}{4095} \times 3.3\,\text{V} \times 2$$
 

@@ -101,16 +101,12 @@ STEPPER_ENN = HIGH (disable drivers)
 # 5. Battery Monitoring
 
 ```
-VBAT ── 100k ──+──→ GPIO15
+VBAT ── 100k ──+──→ GPIO5 (ADC1 ch5)
                |
               100k
                |
               GND
 ```
-
-> ⚠️ **GPIO15 is NOT ADC-capable on ESP32-C6** (ADC1 covers GPIO0–GPIO6 only).
-> Battery voltage monitoring via firmware ADC **will not function** at this pin.
-> Consider routing to an unused GPIO0–GPIO6 pin, or adding an external I2C ADC.
 
 ---
 
@@ -133,9 +129,9 @@ VBAT ── 100k ──+──→ GPIO15
 
 ## VBAT Monitor
 
-| Function   | GPIO   | Note                                                      |
-| ---------- | ------ | --------------------------------------------------------- |
-| VBAT_SENSE | GPIO15 | ⚠️ NOT ADC-capable on ESP32-C6 — voltage divider present but unreadable via firmware ADC |
+| Function   | GPIO  | Note                    |
+| ---------- | ----- | ----------------------- |
+| VBAT_SENSE | GPIO5 | ADC1 channel 5 — fully ADC-capable |
 
 ---
 
@@ -167,10 +163,10 @@ No firmware GPIO required.
 
 ## User Input
 
-| Function     | GPIO  |
-| ------------ | ----- |
-| MODE_BTN     | GPIO4 |
-| CONN_DETECT  | GPIO5 |
+| Function     | GPIO   |
+| ------------ | ------ |
+| MODE_BTN     | GPIO4  |
+| CONN_DETECT  | GPIO15 |
 
 ---
 
@@ -179,12 +175,12 @@ No firmware GPIO required.
 | Pin       | Note                                                                                                  |
 | --------- | ----------------------------------------------------------------------------------------------------- |
 | GPIO4     | Strapping pin → button must NOT be held at boot                                                       |
+| GPIO5     | VBAT_SENSE — ADC1 ch5; 100k/100k divider to VBAT                                                     |
 | GPIO6     | OLED SCL — strapping-safe, pull-up OK                                                                 |
 | GPIO7     | OLED SDA (previously STEPPER_ENN)                                                                     |
-| GPIO15    | VBAT_SENSE — ⚠️ NOT ADC-capable on ESP32-C6; voltage divider connected but firmware cannot read it   |
+| GPIO15    | CONN_DETECT — INPUT_PULLDOWN (internal ~45k); loopback via insole 10k; no external pulldown needed    |
 | GPIO16/17 | UART default → now used for STEP/DIR                                                                  |
 | GPIO8     | Avoid (often onboard LED)                                                                             |
-| GPIO5     | CONN_DETECT — INPUT_PULLDOWN (internal ~45k); loopback via insole 10k; no external pulldown needed    |
 
 ---
 
@@ -282,7 +278,7 @@ At ADC:
 Controller PCB:         Insole PCB:
 pin 6 (3V3) ──────────── 10k ──── pin 8 (CONN_DETECT)
                                         │
-                                   GPIO5 (INPUT_PULLDOWN, ~45k internal)
+                                   GPIO15 (INPUT_PULLDOWN, ~45k internal)
                                         │
                                        GND
 ```
