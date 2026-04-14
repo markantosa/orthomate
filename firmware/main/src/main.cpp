@@ -1,7 +1,7 @@
 /**
  * EPD 3D G6 — Pumped Up Kicks V2
  * Full operational prototype firmware
- * Hardware Reference v5.0
+ * Hardware Reference v6.0
  *
  * ┌──────────────────────────────────────────────────────┐
  * │  State machine                                        │
@@ -13,11 +13,16 @@
  * │  any state    ──[unplug]────► DISCONNECTED            │
  * └──────────────────────────────────────────────────────┘
  *
+ * BLE:
+ *   Service UUID  : 4fa0c560-78a3-11ee-b962-0242ac120002
+ *   Characteristic: 4fa0c561-78a3-11ee-b962-0242ac120002  (NOTIFY, READ)
+ *   Payload (JSON): {"fsr1":<0-100>,"fsr2":<0-100>,"fsr3":<0-100>,
+ *                    "mode":"<STATE>","batt":<0-100>}
+ *   Notified every ~250 ms when a client is subscribed.
+ *
  * Connector detect wiring:
- *   J_MAIN pin 1 (3V3_SENSE) ── 10 kΩ ──► GPIO9
- *   GPIO9 configured INPUT_PULLDOWN
- *   When connector is in: GPIO9 = HIGH (3.3 V through cable)
- *   When connector is out: GPIO9 = LOW (pulled down)
+ *   J_MAIN pin 1 (3V3_SENSE) ── 10 kΩ ──► GPIO15
+ *   GPIO15 configured INPUT_PULLDOWN
  *
  * Force → extension mapping (per reference v4.1 §6):
  *   r_i  = F_i / ΣF          (relative load fraction)
@@ -29,18 +34,19 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <NimBLEDevice.h>
 
-// ── Pin map (Hardware Reference v5.0) ───────────────────────────────────────────
+// ── Pin map (Hardware Reference v6.0) ───────────────────────────────────────────
 
 static constexpr uint8_t PIN_FSR[4]  = {0, 1, 2, 3};   // ADC — FSR1–4
 static constexpr uint8_t PIN_ENN     = 7;                // STEPPER_ENN shared (active LOW)
-static constexpr uint8_t PIN_VBAT    = 6;                // ADC — VBAT_SENSE, 1:2 divider
+static constexpr uint8_t PIN_VBAT    = 5;                // ADC — VBAT_SENSE, 1:2 divider
 static constexpr uint8_t PIN_STEP[3] = {20, 18, 16};    // ACT1 ACT2 ACT3 STEP
 static constexpr uint8_t PIN_DIR[3]  = {19, 14, 17};    // ACT1 ACT2 ACT3 DIR
 static constexpr uint8_t PIN_SDA     = 9;
 static constexpr uint8_t PIN_SCL     = 15;
 static constexpr uint8_t PIN_BUTTON  = 4;               // INPUT_PULLUP, LOW = pressed (boot-safe)
-static constexpr uint8_t PIN_CONN    = 5;               // INPUT_PULLDOWN, HIGH = connected
+static constexpr uint8_t PIN_CONN    = 15;              // INPUT_PULLDOWN, HIGH = connected
 
 // ── OLED (0.91" SSD1306 / SH1106 — I2C 0x3C) ────────────────────────────────
 
@@ -82,6 +88,81 @@ static State   gState     = ST_DISCON;
 static int32_t gPos[3]    = {};   // tracked position in steps from home (0 = retracted)
 static int32_t gTarget[3] = {};   // computed target steps from last measurement
 static float   gRelLoad[4] = {};  // normalised relative load fractions (sum = 1.0)
+
+// ── BLE ───────────────────────────────────────────────────────────────────────
+
+#define BLE_DEVICE_NAME  "EPD3DG6"
+#define BLE_SVC_UUID     "4fa0c560-78a3-11ee-b962-0242ac120002"
+#define BLE_CHAR_UUID    "4fa0c561-78a3-11ee-b962-0242ac120002"
+
+static NimBLECharacteristic* gBleChar     = nullptr;
+static bool                   gBleConnected = false;
+static uint32_t               gBleLastNotify = 0;
+
+static const char* stateName(State s) {
+    switch (s) {
+        case ST_DISCON:    return "DISCONNECTED";
+        case ST_CONN:      return "CONNECTED";
+        case ST_MEASURING: return "MEASURING";
+        case ST_MEASURED:  return "MEASURED";
+        case ST_ACTUATING: return "ACTUATING";
+        case ST_DONE:      return "DONE";
+        case ST_HOMING:    return "HOMING";
+        default:           return "UNKNOWN";
+    }
+}
+
+/** Clamp VBAT → 0-100% (3.3V=0%, 4.2V=100%). */
+static int battPercent(float v) {
+    if (v < 3.3f) return 0;
+    if (v > 4.2f) return 100;
+    return (int)((v - 3.3f) / (4.2f - 3.3f) * 100.0f);
+}
+
+class BleServerCallbacks : public NimBLEServerCallbacks {
+    void onConnect(NimBLEServer*) override {
+        gBleConnected = true;
+        Serial.println("[BLE] Client connected");
+    }
+    void onDisconnect(NimBLEServer* server) override {
+        gBleConnected = false;
+        Serial.println("[BLE] Client disconnected — restarting advertising");
+        server->startAdvertising();
+    }
+};
+
+static void bleNotify(float vbat) {
+    if (!gBleChar) return;
+    char buf[128];
+    snprintf(buf, sizeof(buf),
+        "{\"fsr1\":%d,\"fsr2\":%d,\"fsr3\":%d,\"mode\":\"%s\",\"batt\":%d}",
+        (int)(gRelLoad[0] * 100.0f),
+        (int)(gRelLoad[1] * 100.0f),
+        (int)(gRelLoad[2] * 100.0f),
+        stateName(gState),
+        battPercent(vbat));
+    gBleChar->setValue((uint8_t*)buf, strlen(buf));
+    gBleChar->notify();
+}
+
+static void setupBLE() {
+    NimBLEDevice::init(BLE_DEVICE_NAME);
+    NimBLEDevice::setMTU(128);
+    NimBLEServer* server = NimBLEDevice::createServer();
+    server->setCallbacks(new BleServerCallbacks());
+
+    NimBLEService* svc = server->createService(BLE_SVC_UUID);
+    gBleChar = svc->createCharacteristic(
+        BLE_CHAR_UUID,
+        NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
+    svc->start();
+
+    NimBLEAdvertising* adv = NimBLEDevice::getAdvertising();
+    adv->addServiceUUID(BLE_SVC_UUID);
+    adv->setScanResponse(true);
+    adv->start();
+    Serial.println("[BLE] Advertising as " BLE_DEVICE_NAME);
+}
 
 // ── Button debounce ───────────────────────────────────────────────────────────
 
@@ -298,6 +379,9 @@ void setup() {
 
     showOLED("EPD 3D G6", "Initializing...");
     delay(600);
+
+    setupBLE();
+
     Serial.println("Ready");
 }
 
@@ -401,4 +485,11 @@ void loop() {
     }
 
     delay(50); // ~20 Hz main loop rate
+
+    // ── BLE notify (~4 Hz) ───────────────────────────────────────────────────
+    uint32_t now = millis();
+    if (gBleConnected && (now - gBleLastNotify) >= 250) {
+        gBleLastNotify = now;
+        bleNotify(vbat);
+    }
 }
