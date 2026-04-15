@@ -13,11 +13,15 @@
 ## 1. Open the project
 
 1. Launch VS Code.
-2. **File → Open Folder** → select the firmware subfolder you want to flash:  
-   - `firmware/stepper_test/` — back-and-forth motion smoke test  
-   - `firmware/homing_test/` — blind homing sequence (retract → min, extend → 12 mm)  
-   - `firmware/main/` — full operational firmware  
+2. **File → Open Folder** → select the firmware subfolder you want to flash:
+   - `firmware/stepper_test/` — back-and-forth motion smoke test
+   - `firmware/homing_test/` — blind homing sequence (retract → min, extend → 12 mm)
+   - `firmware/main/` — full operational firmware with BLE, OLED, FSR, battery monitoring
    PlatformIO detects `platformio.ini` and automatically installs the **Espressif32** platform and toolchain on first open (takes 1–3 minutes).
+
+> **Note — NimBLE first build:** `firmware/main/` depends on `h2zero/NimBLE-Arduino @ ^2.1.0`. The first build will download and compile the NimBLE library from scratch which can take **2–4 minutes** on first run. Subsequent builds use the cached library and are much faster.
+
+> **Arduino IDE test sketch:** A minimal BLE server sketch for quick connectivity testing lives in `firmware/ARDUINO IDE APP TEST/sketch_apr14a/`. Open it directly in the **Arduino IDE** (not PlatformIO). You will need to install the following libraries via the Library Manager: **NimBLE-Arduino** (by h2zero) and **ArduinoJson** (by Benoit Blanchon).
 
 ---
 
@@ -111,6 +115,17 @@ Extending to max (18432 steps = 12mm, 1536 steps/mm)...
 At max extension. Done.
 ```
 
+Expected output (main firmware):
+
+```
+EPD 3D G6 — main firmware booting...
+[ADC] VBAT raw sanity: 2217
+[BLE] Advertising as EPD3DG6
+System ready.
+```
+
+The `[ADC] VBAT raw sanity` value confirms the ADC attenuation is set correctly. A value near 0 means the attenuation is not applied and battery readings will be wrong.
+
 ---
 
 ## 6. Tuning motion parameters
@@ -149,3 +164,5 @@ After editing, re-upload with the **→ Upload** button.
 | Motor does not move | Verify ENN is hardwired to GND on PCB; check VM (5 V) present on TMC2209 |
 | Motor vibrates but no movement | Swap motor coil pair (OA1↔OA2 or OB1↔OB2) |
 | Overheating driver | Reduce `STEPS_PER_MOVE` / increase `STEP_DELAY_US`; adjust current via trim pot |
+| Battery shows 0% | `ADC_11db` attenuation must be set (already done in main firmware) |
+| BLE device not found in app | Confirm firmware is advertising (`[BLE] Advertising...` in serial output); cycle BLE on phone |

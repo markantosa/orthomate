@@ -10,6 +10,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.ParcelUuid
+import android.util.Log
+import android.location.LocationManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -128,24 +131,44 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("MissingPermission")
     private fun startScan() {
-        val adapter = (getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
+        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val adapter = bluetoothManager.adapter
         if (adapter == null || !adapter.isEnabled) {
             statusMsg.value = "Bluetooth is off — enable it and retry"
             return
         }
+
+        // Check Location Services for API <= 30
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+            if (!isGpsEnabled && !isNetworkEnabled) {
+                statusMsg.value = "Please enable Location Services"
+                return
+            }
+        }
+
         leScanner = adapter.bluetoothLeScanner
         connState.value = ConnState.SCANNING
-        statusMsg.value = "Scanning for $DEVICE_NAME…"
+        statusMsg.value = "Scanning for EPD service…"
+        Log.d("BLE_DEBUG", "Starting scan with SVC_UUID filter: $SVC_UUID")
 
-        val filter = ScanFilter.Builder().setDeviceName(DEVICE_NAME).build()
+        // Filter by Service UUID instead of Device Name
+        val filter = ScanFilter.Builder()
+            .setServiceUuid(ParcelUuid(SVC_UUID))
+            .build()
+
         val settings = ScanSettings.Builder()
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .build()
 
         leScanner?.startScan(listOf(filter), settings, scanCallback)
 
         // Stop scan after 10 s if nothing found
         mainHandler.postDelayed({
             if (connState.value == ConnState.SCANNING) {
+                Log.d("BLE_DEBUG", "Scan timed out after 10s")
                 leScanner?.stopScan(scanCallback)
                 connState.value = ConnState.DISCONNECTED
                 statusMsg.value = "Device not found — try again"
@@ -156,14 +179,19 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("MissingPermission")
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
+            val deviceName = result.device.name ?: "Unknown"
+            Log.d("BLE_DEBUG", "Found device: $deviceName [${result.device.address}]")
+            
             leScanner?.stopScan(this)
             mainHandler.removeCallbacksAndMessages(null)
             connState.value = ConnState.CONNECTING
-            statusMsg.value = "Connecting…"
+            statusMsg.value = "Connecting to $deviceName…"
             result.device.connectGatt(
                 this@MainActivity, false, gattCallback, BluetoothDevice.TRANSPORT_LE)
         }
+
         override fun onScanFailed(errorCode: Int) {
+            Log.e("BLE_DEBUG", "Scan failed with error code: $errorCode")
             connState.value = ConnState.DISCONNECTED
             statusMsg.value = "Scan failed (err $errorCode)"
         }
@@ -172,11 +200,14 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("MissingPermission")
     private val gattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+            Log.d("BLE_DEBUG", "onConnectionStateChange: status=$status, newState=$newState")
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 bluetoothGatt = gatt
+                Log.d("BLE_DEBUG", "Connected, discovering services...")
                 gatt.discoverServices()
                 mainHandler.post { statusMsg.value = "Discovering services…" }
             } else {
+                Log.d("BLE_DEBUG", "Disconnected or error")
                 mainHandler.post {
                     connState.value  = ConnState.DISCONNECTED
                     deviceData.value = DeviceData()
@@ -188,16 +219,25 @@ class MainActivity : ComponentActivity() {
         }
 
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+            Log.d("BLE_DEBUG", "onServicesDiscovered: status=$status")
             if (status != BluetoothGatt.GATT_SUCCESS) {
                 mainHandler.post { statusMsg.value = "Service discovery failed" }
                 return
             }
+            
+            // Log all found services for debugging
+            gatt.services.forEach { service ->
+                Log.d("BLE_DEBUG", "Service found: ${service.uuid}")
+            }
+
             val char = gatt.getService(SVC_UUID)?.getCharacteristic(CHAR_UUID)
             if (char == null) {
+                Log.e("BLE_DEBUG", "Target service or characteristic not found!")
                 mainHandler.post { statusMsg.value = "EPD service not found on device" }
                 return
             }
             // Enable notifications
+            Log.d("BLE_DEBUG", "Enabling notifications for characteristic...")
             gatt.setCharacteristicNotification(char, true)
             val desc = char.getDescriptor(CCCD_UUID)
             desc?.let {
@@ -206,7 +246,7 @@ class MainActivity : ComponentActivity() {
             }
             mainHandler.post {
                 connState.value = ConnState.CONNECTED
-                statusMsg.value = "Connected to $DEVICE_NAME"
+                statusMsg.value = "Connected to ${gatt.device.name ?: DEVICE_NAME}"
             }
         }
 

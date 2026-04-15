@@ -40,13 +40,13 @@
 
 static constexpr uint8_t PIN_FSR[4]  = {0, 1, 2, 3};   // ADC — FSR1–4
 static constexpr uint8_t PIN_ENN     = 7;                // STEPPER_ENN shared (active LOW)
-static constexpr uint8_t PIN_VBAT    = 5;                // ADC — VBAT_SENSE, 1:2 divider
+static constexpr uint8_t PIN_VBAT    = 5;                // ADC — VBAT_SENSE, 1:2 divider (GPIO5)
 static constexpr uint8_t PIN_STEP[3] = {20, 18, 16};    // ACT1 ACT2 ACT3 STEP
 static constexpr uint8_t PIN_DIR[3]  = {19, 14, 17};    // ACT1 ACT2 ACT3 DIR
-static constexpr uint8_t PIN_SDA     = 9;
-static constexpr uint8_t PIN_SCL     = 15;
+static constexpr uint8_t PIN_SDA     = 7;                // OLED SDA — GPIO7 (hw ref v6.0)
+static constexpr uint8_t PIN_SCL     = 6;                // OLED SCL — GPIO6 (hw ref v6.0)
 static constexpr uint8_t PIN_BUTTON  = 4;               // INPUT_PULLUP, LOW = pressed (boot-safe)
-static constexpr uint8_t PIN_CONN    = 15;              // INPUT_PULLDOWN, HIGH = connected
+static constexpr uint8_t PIN_CONN    = 15;              // INPUT_PULLDOWN, HIGH = connected (GPIO15)
 
 // ── OLED (0.91" SSD1306 / SH1106 — I2C 0x3C) ────────────────────────────────
 
@@ -98,6 +98,7 @@ static float   gRelLoad[4] = {};  // normalised relative load fractions (sum = 1
 static NimBLECharacteristic* gBleChar     = nullptr;
 static bool                   gBleConnected = false;
 static uint32_t               gBleLastNotify = 0;
+static float                  gLastVbat      = 0.0f;  // updated every loop tick
 
 static const char* stateName(State s) {
     switch (s) {
@@ -120,11 +121,11 @@ static int battPercent(float v) {
 }
 
 class BleServerCallbacks : public NimBLEServerCallbacks {
-    void onConnect(NimBLEServer*) override {
+    void onConnect(NimBLEServer*, NimBLEConnInfo&) override {
         gBleConnected = true;
         Serial.println("[BLE] Client connected");
     }
-    void onDisconnect(NimBLEServer* server) override {
+    void onDisconnect(NimBLEServer* server, NimBLEConnInfo&, int) override {
         gBleConnected = false;
         Serial.println("[BLE] Client disconnected — restarting advertising");
         server->startAdvertising();
@@ -147,9 +148,10 @@ static void bleNotify(float vbat) {
 
 static void setupBLE() {
     NimBLEDevice::init(BLE_DEVICE_NAME);
-    NimBLEDevice::setMTU(128);
+    NimBLEDevice::setMTU(185);  // fits full JSON payload comfortably
     NimBLEServer* server = NimBLEDevice::createServer();
     server->setCallbacks(new BleServerCallbacks());
+    server->advertiseOnDisconnect(true); // auto-restart advertising on disconnect
 
     NimBLEService* svc = server->createService(BLE_SVC_UUID);
     gBleChar = svc->createCharacteristic(
@@ -158,8 +160,9 @@ static void setupBLE() {
     svc->start();
 
     NimBLEAdvertising* adv = NimBLEDevice::getAdvertising();
-    adv->addServiceUUID(BLE_SVC_UUID);
-    adv->setScanResponse(true);
+    adv->addServiceUUID(BLE_SVC_UUID);          // UUID in primary ad packet (required for UUID scan filter)
+    adv->setName(BLE_DEVICE_NAME);              // name in scan response packet
+    adv->enableScanResponse(true);
     adv->start();
     Serial.println("[BLE] Advertising as " BLE_DEVICE_NAME);
 }
@@ -281,6 +284,15 @@ static void showOLED(const char* r1, const char* r2 = "", const char* r3 = "") {
     oled.display();
 }
 
+/** Row-3 status bar: "B:67% BLE:OK" — always shown with every state message. */
+static void showOLEDWithStatus(const char* r1, const char* r2 = "") {
+    char r3[22];
+    snprintf(r3, sizeof(r3), "B:%d%% BLE:%s",
+             battPercent(gLastVbat),
+             gBleConnected ? "OK" : "--");
+    showOLED(r1, r2, r3);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Mode 1 — Measurement
 // ─────────────────────────────────────────────────────────────────────────────
@@ -320,7 +332,7 @@ static void doMeasure() {
 
 static void doActuate() {
     if (readVbat() < VBAT_CUTOFF) {
-        showOLED("LOW BATTERY!", "Actuation aborted", "Charge device");
+        showOLEDWithStatus("LOW BATTERY!", "Actuation aborted");
         Serial.println("[ACT] Aborted — low battery");
         delay(2000);
         return;
@@ -338,7 +350,7 @@ static void doActuate() {
         }
         char msg[22];
         snprintf(msg, sizeof(msg), "ACT%d  %d steps", i + 1, (int)gTarget[i]);
-        showOLED("ACTUATING...", msg);
+        showOLEDWithStatus("ACTUATING...", msg);
         Serial.println(msg);
         moveToTarget(i, gTarget[i]);
         delay(ACT_STAGGER_MS); // stagger motor starts (ref §16)
@@ -367,6 +379,14 @@ void setup() {
     pinMode(PIN_BUTTON, INPUT_PULLUP);
     pinMode(PIN_CONN,   INPUT_PULLDOWN);
 
+    // ADC — explicit 12-bit resolution + 11 dB attenuation on VBAT pin.
+    // 11 dB allows reading up to ~3.1 V. Half of 4.2 V battery = 2.1 V — fits.
+    // Without this, default attenuation on ESP32-C6 may cap at ~1.1 V and
+    // return corrupt readings for anything above that.
+    analogReadResolution(12);
+    analogSetPinAttenuation(PIN_VBAT, ADC_11db);
+    Serial.printf("[ADC] VBAT raw sanity: %d\n", analogRead(PIN_VBAT));
+
     // OLED
     Wire.begin(PIN_SDA, PIN_SCL);
     gOledOk = oled.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
@@ -393,11 +413,12 @@ void loop() {
     bool  conn = connPresent();
     bool  btn  = btnEdge();
     float vbat = readVbat();
+    gLastVbat  = vbat;
 
     // ── Hard low-battery override (any state) ────────────────────────────────
     if (vbat > VBAT_NOISE && vbat < VBAT_CUTOFF) {
         digitalWrite(PIN_ENN, HIGH);
-        showOLED("LOW BATTERY!", "Connect charger");
+        showOLEDWithStatus("LOW BATTERY!", "Connect charger");
         delay(5000);
         return;
     }
@@ -424,15 +445,14 @@ void loop() {
 
         // ── No connector ─────────────────────────────────────────────────────
         case ST_DISCON:
-            showOLED("DISCONNECTED", "Attach connector");
+            showOLEDWithStatus("DISCONNECTED", "Attach connector");
             break;
 
         // ── Connector present, idle ───────────────────────────────────────────
         case ST_CONN: {
             bool lowBatt = (vbat > VBAT_NOISE && vbat < VBAT_WARN);
-            showOLED("CONNECTED",
-                     lowBatt ? "! LOW BATTERY" : "Ready",
-                     "Btn: measure");
+            showOLEDWithStatus("CONNECTED",
+                               lowBatt ? "! LOW BATTERY" : "Btn: measure");
             if (btn) {
                 gState = ST_MEASURING;
             }
@@ -441,19 +461,17 @@ void loop() {
 
         // ── Mode 1: measure FSRs ──────────────────────────────────────────────
         case ST_MEASURING:
-            showOLED("MEASURING...", "Hold still");
+            showOLEDWithStatus("MEASURING...", "Hold still");
             doMeasure();
             gState = ST_MEASURED;
             break;
 
         // ── Show result, wait for second press ────────────────────────────────
         case ST_MEASURED: {
-            char l2[33], l3[33];
+            char l2[33];
             snprintf(l2, sizeof(l2), "r:%.2f %.2f %.2f",
                      gRelLoad[0], gRelLoad[1], gRelLoad[2]);
-            snprintf(l3, sizeof(l3), "T:%d %d %d stp",
-                     (int)gTarget[0], (int)gTarget[1], (int)gTarget[2]);
-            showOLED("MEAS COMPLETE", l2, l3);
+            showOLEDWithStatus("MEAS COMPLETE", l2);
             if (btn) gState = ST_ACTUATING;
             break;
         }
@@ -466,10 +484,7 @@ void loop() {
 
         // ── Insole shaped — user disconnects to use ──────────────────────────
         case ST_DONE: {
-            char l2[33];
-            snprintf(l2, sizeof(l2), "Ext:%d %d %d stp",
-                     (int)gPos[0], (int)gPos[1], (int)gPos[2]);
-            showOLED("INSOLE SHAPED", l2, "Disconnect to use");
+            showOLEDWithStatus("INSOLE SHAPED", "Unplug to use");
             // No button action — user simply unplugs the connector.
             // On next reconnect, ST_HOMING will retract before new cycle.
             break;
@@ -477,7 +492,7 @@ void loop() {
 
         // ── Auto-home on reconnect with actuators extended ────────────────────
         case ST_HOMING:
-            showOLED("HOMING...", "Retracting all", "Please wait");
+            showOLEDWithStatus("HOMING...", "Retracting...");
             retractAll(); // drives all axes to 0 and sets gPos[i]=0, ENN→HIGH
             gState = ST_CONN;
             Serial.println("[HOME] Complete");

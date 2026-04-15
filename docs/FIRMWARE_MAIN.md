@@ -158,6 +158,17 @@ return vadc * 2.0f;
 
 The cutoff check runs **before** the state machine in every loop iteration — it cannot be bypassed by state transitions.
 
+**ADC configuration (critical):** The ESP32-C6 default ADC attenuation is `ADC_0db` (~0–0.8 V). The VBAT sense node sits at ~1.85 V at 3.7 V nominal charge. Without explicit attenuation, all readings saturate and return ~0%.
+
+```cpp
+// setup()
+analogReadResolution(12);                               // 0–4095
+analogSetPinAttenuation(PIN_VBAT, ADC_11db);            // 0–3.3 V full-scale
+Serial.printf("[ADC] VBAT raw sanity: %d\n", analogRead(PIN_VBAT));
+```
+
+The same `ADC_11db` setting applies to all FSR pins (GPIO 0–3) to cover pressures up to the divider rail voltage.
+
 ---
 
 ## 6. Actuation
@@ -218,17 +229,107 @@ falling edge detected (LOW) + !gLastBtn + Δt > BTN_DEBOUNCE_MS (30 ms)
 
 ---
 
-## 8. OLED display
+## 8. BLE (Bluetooth Low Energy)
 
-`showOLED(r1, r2, r3)` draws up to 3 rows on the 128×32 SSD1306. It includes a **content cache** — if all three strings match the previous call, no I2C transaction is issued. This prevents unnecessary bus activity during motor current pulses.
+**Library:** `h2zero/NimBLE-Arduino @ ^2.1.0` (resolves to v2.5.0). NimBLE 1.4.x is **not compatible** with ESP32-C6 IDF 5.x — it fails with a missing `syscfg/syscfg.h` header. NimBLE 2.x bundles its own Mynewt stack and is IDF 5.x safe.
 
-The display is non-critical: `gOledOk` is checked at the start of every call, so firmware continues normally if no OLED is detected.
+**Function:** `setupBLE()` — called once in `setup()`:
+
+```cpp
+NimBLEDevice::init("EPD3DG6");
+NimBLEDevice::setMTU(185);
+NimBLEServer* server = NimBLEDevice::createServer();
+server->setCallbacks(new BleServerCallbacks());
+server->advertiseOnDisconnect(true);     // auto-restart advertising after disconnect
+
+NimBLEService* svc = server->createService(SVC_UUID);
+gBleChar = svc->createCharacteristic(CHAR_UUID,
+    NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
+svc->start();
+
+NimBLEAdvertising* adv = NimBLEDevice::getAdvertising();
+adv->addServiceUUID(SVC_UUID);
+adv->setName("EPD3DG6");
+adv->enableScanResponse(true);
+adv->start();
+```
+
+**UUIDs:**
+
+| Item | UUID |
+|------|------|
+| Service | `4fa0c560-78a3-11ee-b962-0242ac120002` |
+| Characteristic | `4fa0c561-78a3-11ee-b962-0242ac120002` |
+
+**Notify payload:** JSON, sent every 250 ms when a client is connected:
+
+```json
+{"fsr1": 42, "fsr2": 18, "fsr3": 75, "mode": "MEASURING", "batt": 67}
+```
+
+- `fsr1–3`: relative FSR percentage (0–100), computed from `gRelLoad[]`
+- `mode`: current state name string (`DISCONNECTED`, `CONNECTED`, `MEASURING`, `MEASURED`, `ACTUATING`, `DONE`, `HOMING`)
+- `batt`: battery percentage (0–100), mapped from 3.3 V → 0% to 4.2 V → 100%
+
+**Globals:**
+
+```cpp
+NimBLECharacteristic* gBleChar      = nullptr;  // characteristic handle
+bool                   gBleConnected = false;    // true when client subscribed
+uint32_t               gBleLastNotify = 0;       // millis() timestamp of last notify
+float                  gLastVbat     = 0.0f;     // latest VBAT reading cached for notify
+```
+
+**Connection callbacks** (NimBLE 2.x API):
+
+```cpp
+void onConnect(NimBLEServer*, NimBLEConnInfo&)       { gBleConnected = true; }
+void onDisconnect(NimBLEServer*, NimBLEConnInfo&, int) { gBleConnected = false; }
+```
+
+NimBLE 1.x used `NimBLEServerCallbacks::onConnect(NimBLEServer*)` without the `NimBLEConnInfo&` and reason integer — using the old signatures is a compile error on v2.x.
+
+**`bleNotify(float vbat)`** formats the JSON and calls `gBleChar->setValue()` + `gBleChar->notify()`. It is called from `loop()` every 250 ms when `gBleConnected == true`:
+
+```cpp
+if (gBleConnected && (millis() - gBleLastNotify >= 250)) {
+    bleNotify(vbat);
+    gBleLastNotify = millis();
+}
+```
+
+---
+
+## 9. OLED display
+
+**`showOLEDWithStatus(r1, r2)`** is the primary display function used throughout the state machine. It always appends a third row with battery % and BLE connection status:
+
+```
+Row 1: <state label>           e.g. "CONNECTED"
+Row 2: <detail info>           e.g. "Press button"
+Row 3: B:72% BLE:OK            or "B:72% BLE:--" when not connected
+```
+
+It internally calls `showOLED(r1, r2, statusRow)` which includes a **content cache** — no I2C transaction is issued if all three strings are unchanged from the previous call.
+
+| State | Row 1 | Row 2 |
+|-------|-------|-------|
+| ST_DISCON | DISCONNECTED | Plug in insole |
+| ST_CONN (normal) | CONNECTED | Press button |
+| ST_CONN (low batt) | ! LOW BATTERY | Charge now |
+| ST_MEASURING | MEASURING... | Please wait |
+| ST_MEASURED | MEASURED | Press to actuate |
+| ST_ACTUATING | ACTUATING... | Please wait |
+| ST_DONE | DONE | Unplug to use |
+| ST_HOMING | HOMING... | Please wait |
+
+The display is non-critical: `gOledOk` is checked at the start of every call. If no OLED is detected on boot, display calls are silently skipped.
 
 I2C bus: SDA = GPIO7, SCL = GPIO6.
 
 ---
 
-## 9. Key constants summary
+## 10. Key constants summary
 
 | Constant | Value | Meaning |
 |---|---|---|
@@ -241,3 +342,5 @@ I2C bus: SDA = GPIO7, SCL = GPIO6.
 | `BTN_DEBOUNCE_MS` | 30 ms | Minimum time between accepted button edges |
 | `VBAT_WARN` | 3.50 V | OLED warning threshold |
 | `VBAT_CUTOFF` | 3.35 V | Hard motor disable threshold |
+| `SVC_UUID` | `4fa0c560-...` | BLE service UUID |
+| `CHAR_UUID` | `4fa0c561-...` | BLE characteristic UUID |
