@@ -13,7 +13,7 @@
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
 
     <application
-        android:label="EPD 3D G6"
+        android:label="Orthomate"
         android:theme="@style/Theme.EPD3DG6"
         android:allowBackup="false"
         android:supportsRtl="true">

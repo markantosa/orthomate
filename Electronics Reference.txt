@@ -1,4 +1,4 @@
-# 🔧 Pumped Up Kicks V2
+# 🔧 Orthomate
 
 ## Hardware Design Reference (FINAL)
 

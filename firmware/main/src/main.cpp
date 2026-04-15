@@ -17,7 +17,9 @@
  *   Service UUID  : 4fa0c560-78a3-11ee-b962-0242ac120002
  *   Characteristic: 4fa0c561-78a3-11ee-b962-0242ac120002  (NOTIFY, READ)
  *   Payload (JSON): {"fsr1":<0-100>,"fsr2":<0-100>,"fsr3":<0-100>,
- *                    "mode":"<STATE>","batt":<0-100>}
+ *                    "mode":"<STATE>","batt":<0-100>,"snap":<0|1>}
+ *   snap=0 → live FSR readings  (all states except ACTUATING / DONE)
+ *   snap=1 → measurement snapshot (ACTUATING and DONE states)
  *   Notified every ~250 ms when a client is subscribed.
  *
  * Connector detect wiring:
@@ -87,7 +89,8 @@ enum State : uint8_t {
 static State   gState     = ST_DISCON;
 static int32_t gPos[3]    = {};   // tracked position in steps from home (0 = retracted)
 static int32_t gTarget[3] = {};   // computed target steps from last measurement
-static float   gRelLoad[4] = {};  // normalised relative load fractions (sum = 1.0)
+static float   gRelLoad[4]      = {};  // live normalised relative load fractions (sum = 1.0)
+static float   gMeasuredLoad[3] = {};  // snapshot saved at end of doMeasure() — used during ACTUATING/DONE
 
 // ── BLE ───────────────────────────────────────────────────────────────────────
 
@@ -134,14 +137,22 @@ class BleServerCallbacks : public NimBLEServerCallbacks {
 
 static void bleNotify(float vbat) {
     if (!gBleChar) return;
-    char buf[128];
+
+    // During ACTUATING and DONE, broadcast the frozen measurement snapshot so
+    // the app can display and store the data used to shape the insole.
+    // snap=1 signals the app to treat these as stored values, not live readings.
+    bool useSnapshot = (gState == ST_ACTUATING || gState == ST_DONE);
+    const float* fsrSrc = useSnapshot ? gMeasuredLoad : gRelLoad;
+
+    char buf[140];
     snprintf(buf, sizeof(buf),
-        "{\"fsr1\":%d,\"fsr2\":%d,\"fsr3\":%d,\"mode\":\"%s\",\"batt\":%d}",
-        (int)(gRelLoad[0] * 100.0f),
-        (int)(gRelLoad[1] * 100.0f),
-        (int)(gRelLoad[2] * 100.0f),
+        "{\"fsr1\":%d,\"fsr2\":%d,\"fsr3\":%d,\"mode\":\"%s\",\"batt\":%d,\"snap\":%d}",
+        (int)(fsrSrc[0] * 100.0f),
+        (int)(fsrSrc[1] * 100.0f),
+        (int)(fsrSrc[2] * 100.0f),
         stateName(gState),
-        battPercent(vbat));
+        battPercent(vbat),
+        useSnapshot ? 1 : 0);
     gBleChar->setValue((uint8_t*)buf, strlen(buf));
     gBleChar->notify();
 }
@@ -318,11 +329,14 @@ static void doMeasure() {
         gTarget[i] = (int32_t)(ext * MAX_EXT_STEPS);
     }
 
+    // Save measurement snapshot — BLE will broadcast this during ACTUATING/DONE
+    for (int i = 0; i < 3; i++) gMeasuredLoad[i] = gRelLoad[i];
+
     Serial.printf("[MEAS] raw=%.0f %.0f %.0f %.0f  "
                   "rel=%.3f %.3f %.3f %.3f\n",
                   raw[0], raw[1], raw[2], raw[3],
                   gRelLoad[0], gRelLoad[1], gRelLoad[2], gRelLoad[3]);
-    Serial.printf("[MEAS] targets=%d %d %d steps\n",
+    Serial.printf("[MEAS] targets=%d %d %d steps  snapshot saved\n",
                   (int)gTarget[0], (int)gTarget[1], (int)gTarget[2]);
 }
 

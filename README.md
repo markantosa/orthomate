@@ -1,4 +1,4 @@
-# EPD 3D G6 — Pumped Up Kicks V2
+# EPD 3D G6 — Orthomate
 
 Battery-powered adaptive orthopedic insole controller. Redistributes plantar pressure in real-time using three micro linear stepper actuators driven by force sensor feedback. Includes a BLE companion Android app for live monitoring.
 
@@ -20,7 +20,7 @@ Battery-powered adaptive orthopedic insole controller. Redistributes plantar pre
 ## Repository structure
 
 ```
-pumped-up-kicks/
+orthomate/
 ├── Electronics Reference.txt   # Hardware design spec (v6.0)
 ├── BOM.txt                     # Bill of materials
 ├── firmware/

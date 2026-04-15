@@ -37,6 +37,18 @@ import androidx.core.content.ContextCompat
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.util.UUID
+import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
+import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.Query
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 // ── BLE constants (must match firmware) ─────────────────────────────────────
 private const val DEVICE_NAME    = "EPD3DG6"
@@ -44,63 +56,163 @@ private val SVC_UUID  = UUID.fromString("4fa0c560-78a3-11ee-b962-0242ac120002")
 private val CHAR_UUID = UUID.fromString("4fa0c561-78a3-11ee-b962-0242ac120002")
 private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
+// ── Enums ────────────────────────────────────────────────────────────────────
+enum class ConnState { DISCONNECTED, SCANNING, CONNECTING, CONNECTED }
+
 // ── Data model ───────────────────────────────────────────────────────────────
 data class DeviceData(
     val fsr1: Int = 0,      // 0-100 relative %
     val fsr2: Int = 0,
     val fsr3: Int = 0,
     val mode: String = "—",
-    val batt: Int = 0       // 0-100 %
+    val batt: Int = 0,      // 0-100 %
+    val snap: Int = 0       // 0 or 1
 )
 
-enum class ConnState { DISCONNECTED, SCANNING, CONNECTING, CONNECTED }
+data class FsrSnapshot(
+    val fsr1: Int,
+    val fsr2: Int,
+    val fsr3: Int,
+    val timestamp: Long
+)
 
-// ── Colour helpers ────────────────────────────────────────────────────────────
-private fun fsrColor(pct: Int): Color = when {
-    pct < 34 -> Color(0xFF4CAF50)   // green  — low force
-    pct < 67 -> Color(0xFFFFC107)   // yellow — medium force
-    else     -> Color(0xFFF44336)   // red    — high force
+// ── Gemini API ────────────────────────────────────────────────────────────────
+interface GeminiService {
+    @POST("v1beta/models/gemini-1.5-flash:generateContent")
+    suspend fun generateContent(
+        @Query("key") apiKey: String,
+        @Body request: GeminiRequest
+    ): GeminiResponse
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MainActivity
-// ─────────────────────────────────────────────────────────────────────────────
+data class GeminiRequest(val contents: List<Content>)
+data class Content(val parts: List<Part>)
+data class Part(val text: String)
+data class GeminiResponse(val candidates: List<Candidate>)
+data class Candidate(val content: Content)
+
+// ── MainActivity ─────────────────────────────────────────────────────────────
 class MainActivity : ComponentActivity() {
 
     // States exposed to Compose
     private val connState  = mutableStateOf(ConnState.DISCONNECTED)
     private val deviceData = mutableStateOf(DeviceData())
     private val statusMsg  = mutableStateOf("Press CONNECT to scan")
+    private val lastSnapshot = mutableStateOf<FsrSnapshot?>(null)
+    private val geminiResponse = mutableStateOf<String?>(null)
+    private val isGeminiLoading = mutableStateOf(false)
+    private val showKeyDialog = mutableStateOf(false)
 
-    // BLE handles
+    private val permLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { results ->
+        if (results.all { it.value }) startScan()
+        else statusMsg.value = "Permissions denied"
+    }
+
+    private lateinit var encryptedPrefs: SharedPreferences
+
+    // ... (existing BLE handles)
     private var bluetoothGatt: BluetoothGatt? = null
     private var leScanner: BluetoothLeScanner? = null
     private val mainHandler = Handler(Looper.getMainLooper())
 
-    // ── Permission launcher ───────────────────────────────────────────────────
-    private val permLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { grants ->
-        if (grants.values.all { it }) startScan()
-        else statusMsg.value = "BLE permissions denied"
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Lifecycle
-    // ─────────────────────────────────────────────────────────────────────────
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        encryptedPrefs = EncryptedSharedPreferences.create(
+            "secret_shared_prefs",
+            masterKeyAlias,
+            this,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+
+        loadSnapshot()
+
         setContent {
-            EPD3DG6Theme {
+            OrthomateTheme {
                 Surface(modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background) {
                     MainScreen(
                         connState  = connState.value,
                         data       = deviceData.value,
                         statusMsg  = statusMsg.value,
+                        snapshot   = lastSnapshot.value,
+                        geminiText = geminiResponse.value,
+                        isLoading  = isGeminiLoading.value,
                         onConnect  = { handleConnect() },
-                        onDisconnect = { disconnect() }
+                        onDisconnect = { disconnect() },
+                        onAnalyse  = { checkApiKeyAndAnalyse() }
                     )
+
+                    if (showKeyDialog.value) {
+                        ApiKeyDialog(
+                            onDismiss = { showKeyDialog.value = false },
+                            onSave = { key ->
+                                encryptedPrefs.edit().putString("gemini_api_key", key).apply()
+                                showKeyDialog.value = false
+                                analyseWithGemini(key)
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun loadSnapshot() {
+        val json = encryptedPrefs.getString("last_snapshot", null)
+        if (json != null) {
+            lastSnapshot.value = Gson().fromJson(json, FsrSnapshot::class.java)
+        }
+    }
+
+    private fun saveSnapshot(s: FsrSnapshot) {
+        lastSnapshot.value = s
+        encryptedPrefs.edit().putString("last_snapshot", Gson().toJson(s)).apply()
+    }
+
+    private fun checkApiKeyAndAnalyse() {
+        val key = encryptedPrefs.getString("gemini_api_key", null)
+        if (key.isNullOrBlank()) {
+            showKeyDialog.value = true
+        } else {
+            analyseWithGemini(key)
+        }
+    }
+
+    private fun analyseWithGemini(apiKey: String) {
+        val snap = lastSnapshot.value ?: return
+        isGeminiLoading.value = true
+        geminiResponse.value = null
+
+        val prompt = "I used a smart insole that measured the relative pressure distribution across my foot. " +
+                "Results: Metatarsal (ball of foot): ${snap.fsr1}%, Arch: ${snap.fsr2}%, Heel: ${snap.fsr3}%. " +
+                "Based on this distribution, give me: 1. What this pattern suggests about my foot shape or posture " +
+                "2. Any foot health considerations I should be aware of 3. Practical tips for footwear, stretches, " +
+                "or habits that suit this profile. Keep the response clear and non-medical in tone."
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://generativelanguage.googleapis.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val service = retrofit.create(GeminiService::class.java)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = service.generateContent(apiKey, GeminiRequest(listOf(Content(listOf(Part(prompt))))))
+                val text = response.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.text
+                withContext(Dispatchers.Main) {
+                    geminiResponse.value = text ?: "No response from Gemini."
+                    isGeminiLoading.value = false
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    geminiResponse.value = "Error: ${e.message}"
+                    isGeminiLoading.value = false
                 }
             }
         }
@@ -278,9 +390,15 @@ class MainActivity : ComponentActivity() {
                 fsr2 = obj.optInt("fsr2", 0).coerceIn(0, 100),
                 fsr3 = obj.optInt("fsr3", 0).coerceIn(0, 100),
                 mode = obj.optString("mode", "—"),
-                batt = obj.optInt("batt", 0).coerceIn(0, 100)
+                batt = obj.optInt("batt", 0).coerceIn(0, 100),
+                snap = obj.optInt("snap", 0)
             )
-            mainHandler.post { deviceData.value = d }
+            mainHandler.post {
+                deviceData.value = d
+                if (d.snap == 1) {
+                    saveSnapshot(FsrSnapshot(d.fsr1, d.fsr2, d.fsr3, System.currentTimeMillis()))
+                }
+            }
         } catch (_: Exception) { /* malformed packet — ignore */ }
     }
 
@@ -306,14 +424,21 @@ fun MainScreen(
     connState: ConnState,
     data: DeviceData,
     statusMsg: String,
+    snapshot: FsrSnapshot?,
+    geminiText: String?,
+    isLoading: Boolean,
     onConnect: () -> Unit,
-    onDisconnect: () -> Unit
+    onDisconnect: () -> Unit,
+    onAnalyse: () -> Unit
 ) {
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF121212))
-            .padding(20.dp),
+            .padding(20.dp)
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -356,28 +481,80 @@ fun MainScreen(
         Spacer(Modifier.height(24.dp))
 
         // ── Foot diagram ───────────────────────────────────────────────────
-        Text("PRESSURE MAP", color = Color.Gray, fontSize = 12.sp)
-        Spacer(Modifier.height(16.dp))
+        Box(contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("PRESSURE MAP", color = Color.Gray, fontSize = 12.sp)
+                Spacer(Modifier.height(16.dp))
 
-        FootDiagram(
-            fsr1 = data.fsr1,
-            fsr2 = data.fsr2,
-            fsr3 = data.fsr3,
-            active = connState == ConnState.CONNECTED
-        )
+                val displayFsr1 = if (data.snap == 1) data.fsr1 else if (connState == ConnState.CONNECTED) data.fsr1 else 0
+                val displayFsr2 = if (data.snap == 1) data.fsr2 else if (connState == ConnState.CONNECTED) data.fsr2 else 0
+                val displayFsr3 = if (data.snap == 1) data.fsr3 else if (connState == ConnState.CONNECTED) data.fsr3 else 0
+
+                FootDiagram(
+                    fsr1 = displayFsr1,
+                    fsr2 = displayFsr2,
+                    fsr3 = displayFsr3,
+                    active = connState == ConnState.CONNECTED || data.snap == 1
+                )
+            }
+
+            if (data.snap == 1) {
+                Box(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(Color(0xFFFF5252).copy(alpha = 0.9f))
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text("MEASURED", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                }
+            }
+        }
 
         Spacer(Modifier.height(32.dp))
 
         // ── FSR legend ─────────────────────────────────────────────────────
         Column(horizontalAlignment = Alignment.Start, modifier = Modifier.fillMaxWidth()) {
-            FsrLegendRow("FSR1 (metatarsal)", data.fsr1, connState == ConnState.CONNECTED)
+            val isActive = connState == ConnState.CONNECTED || data.snap == 1
+            FsrLegendRow("Metatarsal (FSR1)", if (data.snap == 1) data.fsr1 else data.fsr1, isActive)
             Spacer(Modifier.height(8.dp))
-            FsrLegendRow("FSR2 (lateral)",    data.fsr2, connState == ConnState.CONNECTED)
+            FsrLegendRow("Arch (FSR2)", if (data.snap == 1) data.fsr2 else data.fsr2, isActive)
             Spacer(Modifier.height(8.dp))
-            FsrLegendRow("FSR3 (heel)",        data.fsr3, connState == ConnState.CONNECTED)
+            FsrLegendRow("Heel (FSR3)", if (data.snap == 1) data.fsr3 else data.fsr3, isActive)
         }
 
-        Spacer(Modifier.weight(1f))
+        if (snapshot != null) {
+            Spacer(Modifier.height(24.dp))
+            Button(
+                onClick = onAnalyse,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8E24AA))
+            ) {
+                Text("ANALYSE WITH GEMINI", fontWeight = FontWeight.Bold)
+            }
+        }
+
+        if (isLoading) {
+            Spacer(Modifier.height(16.dp))
+            CircularProgressIndicator(color = Color(0xFF8E24AA))
+        }
+
+        geminiText?.let {
+            Spacer(Modifier.height(16.dp))
+            Surface(
+                color = Color(0xFF2C2C2C),
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    it,
+                    color = Color.White,
+                    modifier = Modifier.padding(16.dp),
+                    fontSize = 14.sp
+                )
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
 
         // ── Status text ────────────────────────────────────────────────────
         Text(statusMsg, color = Color.Gray, fontSize = 12.sp)
@@ -497,12 +674,49 @@ fun FsrLegendRow(label: String, pct: Int, active: Boolean) {
     }
 }
 
+fun fsrColor(pct: Int): Color {
+    return when {
+        pct < 20 -> Color(0xFF2196F3) // Blue
+        pct < 50 -> Color(0xFF4CAF50) // Green
+        pct < 80 -> Color(0xFFFFEB3B) // Yellow
+        else     -> Color(0xFFF44336) // Red
+    }
+}
+
+@Composable
+fun ApiKeyDialog(onDismiss: () -> Unit, onSave: (String) -> Unit) {
+    var key by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Enter Gemini API Key") },
+        text = {
+            Column {
+                Text("Your API key is stored securely in EncryptedSharedPreferences.", fontSize = 12.sp)
+                Spacer(Modifier.height(8.dp))
+                TextField(
+                    value = key,
+                    onValueChange = { key = it },
+                    label = { Text("API Key") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onSave(key) }) { Text("SAVE & ANALYSE") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("CANCEL") }
+        }
+    )
+}
+
 // ── Theme ─────────────────────────────────────────────────────────────────────
 @Composable
-fun EPD3DG6Theme(content: @Composable () -> Unit) {
+fun OrthomateTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = darkColorScheme(
-            primary   = Color(0xFF1E88E5),
+            primary   = Color(0xFF8E24AA),
             background = Color(0xFF121212),
             surface   = Color(0xFF1E1E1E)
         ),
