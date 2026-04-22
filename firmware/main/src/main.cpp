@@ -17,7 +17,7 @@
  *   Service UUID  : 4fa0c560-78a3-11ee-b962-0242ac120002
  *   Characteristic: 4fa0c561-78a3-11ee-b962-0242ac120002  (NOTIFY, READ)
  *   Payload (JSON): {"fsr1":<0-100>,"fsr2":<0-100>,"fsr3":<0-100>,
- *                    "mode":"<STATE>","batt":<0-100>,"snap":<0|1>}
+ *                    "mode":"<STATE>","snap":<0|1>}
  *   snap=0 → live FSR readings  (all states except ACTUATING / DONE)
  *   snap=1 → measurement snapshot (ACTUATING and DONE states)
  *   Notified every ~250 ms when a client is subscribed.
@@ -42,7 +42,6 @@
 
 static constexpr uint8_t PIN_FSR[4]  = {0, 1, 2, 3};   // ADC — FSR1–4
 static constexpr uint8_t PIN_ENN     = 7;                // STEPPER_ENN shared (active LOW)
-static constexpr uint8_t PIN_VBAT    = 5;                // ADC — VBAT_SENSE, 1:2 divider (GPIO5)
 static constexpr uint8_t PIN_STEP[3] = {20, 18, 16};    // ACT1 ACT2 ACT3 STEP
 static constexpr uint8_t PIN_DIR[3]  = {19, 14, 17};    // ACT1 ACT2 ACT3 DIR
 static constexpr uint8_t PIN_SDA     = 7;                // OLED SDA — GPIO7 (hw ref v6.0)
@@ -58,17 +57,11 @@ static bool              gOledOk     = false;
 
 // ── Motion parameters ────────────────────────────────────────────────────────
 
-static constexpr uint32_t MAX_EXT_STEPS  = 400;    // steps = full extension travel
-static constexpr uint32_t STEP_DELAY_US  = 1500;   // µs between step edges → ~333 steps/s
+static constexpr uint32_t MAX_EXT_STEPS  = 21000;  // steps = full extension travel
+static constexpr uint32_t STEP_DELAY_US  = 500;    // µs between step edges (3× cycle test speed)
 static constexpr uint32_t STEP_PULSE_US  = 5;      // µs STEP pin HIGH width
 static constexpr uint32_t ACT_STAGGER_MS = 75;     // delay between consecutive motor starts
 static constexpr float    EXT_DEADBAND   = 0.08f;  // suppress negligible extensions
-
-// ── Battery thresholds ───────────────────────────────────────────────────────
-
-static constexpr float VBAT_WARN   = 3.5f;   // show low-battery warning on OLED
-static constexpr float VBAT_CUTOFF = 3.35f;  // disable motor actuation
-static constexpr float VBAT_NOISE  = 0.5f;   // guard: ignore reads below this (no battery)
 
 // ── ADC sampling ─────────────────────────────────────────────────────────────
 
@@ -91,22 +84,47 @@ static int32_t gPos[3]    = {};   // tracked position in steps from home (0 = re
 static int32_t gTarget[3] = {};   // computed target steps from last measurement
 static float   gRelLoad[4]      = {};  // live normalised relative load fractions (sum = 1.0)
 static float   gMeasuredLoad[3] = {};  // snapshot saved at end of doMeasure() — used during ACTUATING/DONE
+static int     gLiveRaw[3]      = {};  // continuous single-sample live ADC reads for BLE display
+
+// Minimum total raw ADC sum across all 3 FSRs to consider as real pressure.
+// Below this, all live channels are shown as 0 (noise floor).
+static constexpr int ADC_NOISE_FLOOR = 150; // per-channel floor — below this, channel reads 0
+
+// Per-sensor full-scale ADC value (12-bit, 0–4095).
+// Set each to the raw ADC reading you see in Serial Monitor when pressing FIRMLY on that FSR.
+// Watch Serial Monitor (115200 baud) — it prints: [LIVE] r0=XXXX r1=XXXX r2=XXXX
+static constexpr int FSR_SCALE[3] = {
+    3,  // FSR0 = Metatarsal — raise if bar barely moves; lower if it maxes out too easily
+    3,  // FSR1 = Arch       — stuck at 100% means this is too low; raise it
+    3   // FSR2 = Heel       — too sensitive means this is too high; lower it
+};
 
 // ── BLE ───────────────────────────────────────────────────────────────────────
 
 #define BLE_DEVICE_NAME  "EPD3DG6"
 #define BLE_SVC_UUID     "4fa0c560-78a3-11ee-b962-0242ac120002"
 #define BLE_CHAR_UUID    "4fa0c561-78a3-11ee-b962-0242ac120002"
+#define BLE_CMD_UUID     "4fa0c562-78a3-11ee-b962-0242ac120002"  // WRITE — app→device
+
+// BLE commands (single-byte)
+#define CMD_BUTTON  0x01  // virtual button press
+#define CMD_HOME    0x02  // force home all actuators
+#define CMD_ESTOP   0x03  // emergency stop — disable drivers immediately
 
 static NimBLECharacteristic* gBleChar     = nullptr;
+static NimBLECharacteristic* gBleCmdChar  = nullptr;
 static bool                   gBleConnected = false;
 static uint32_t               gBleLastNotify = 0;
-static float                  gLastVbat      = 0.0f;  // updated every loop tick
+
+// Pending commands set from BLE write callback, consumed in loop()
+static volatile bool gCmdButton = false;
+static volatile bool gCmdHome   = false;
+static volatile bool gCmdEstop  = false;
 
 static const char* stateName(State s) {
     switch (s) {
         case ST_DISCON:    return "DISCONNECTED";
-        case ST_CONN:      return "CONNECTED";
+        case ST_CONN:      return "IDLE";
         case ST_MEASURING: return "MEASURING";
         case ST_MEASURED:  return "MEASURED";
         case ST_ACTUATING: return "ACTUATING";
@@ -114,13 +132,6 @@ static const char* stateName(State s) {
         case ST_HOMING:    return "HOMING";
         default:           return "UNKNOWN";
     }
-}
-
-/** Clamp VBAT → 0-100% (3.3V=0%, 4.2V=100%). */
-static int battPercent(float v) {
-    if (v < 3.3f) return 0;
-    if (v > 4.2f) return 100;
-    return (int)((v - 3.3f) / (4.2f - 3.3f) * 100.0f);
 }
 
 class BleServerCallbacks : public NimBLEServerCallbacks {
@@ -135,7 +146,7 @@ class BleServerCallbacks : public NimBLEServerCallbacks {
     }
 };
 
-static void bleNotify(float vbat) {
+static void bleNotify() {
     if (!gBleChar) return;
 
     // During ACTUATING and DONE, broadcast the frozen measurement snapshot so
@@ -144,30 +155,56 @@ static void bleNotify(float vbat) {
     bool useSnapshot = (gState == ST_ACTUATING || gState == ST_DONE);
     const float* fsrSrc = useSnapshot ? gMeasuredLoad : gRelLoad;
 
-    char buf[140];
+    // Always include live FSR readings alongside snap data so the app can
+    // display both simultaneously.
+    char buf[160];
     snprintf(buf, sizeof(buf),
-        "{\"fsr1\":%d,\"fsr2\":%d,\"fsr3\":%d,\"mode\":\"%s\",\"batt\":%d,\"snap\":%d}",
+        "{\"fsr1\":%d,\"fsr2\":%d,\"fsr3\":%d,"
+        "\"live1\":%d,\"live2\":%d,\"live3\":%d,"
+        "\"mode\":\"%s\",\"snap\":%d,"
+        "\"act1\":%d,\"act2\":%d,\"act3\":%d}",
         (int)(fsrSrc[0] * 100.0f),
         (int)(fsrSrc[1] * 100.0f),
         (int)(fsrSrc[2] * 100.0f),
+        gLiveRaw[0],
+        gLiveRaw[1],
+        gLiveRaw[2],
         stateName(gState),
-        battPercent(vbat),
-        useSnapshot ? 1 : 0);
+        useSnapshot ? 1 : 0,
+        (gState == ST_ACTUATING || gState == ST_DONE) ? (int)gPos[0] : 0,
+        (gState == ST_ACTUATING || gState == ST_DONE) ? (int)gPos[1] : 0,
+        (gState == ST_ACTUATING || gState == ST_DONE) ? (int)gPos[2] : 0);
     gBleChar->setValue((uint8_t*)buf, strlen(buf));
     gBleChar->notify();
 }
 
+class BleCmdCallbacks : public NimBLECharacteristicCallbacks {
+    void onWrite(NimBLECharacteristic* c, NimBLEConnInfo&) override {
+        auto val = c->getValue();
+        if (val.size() == 0) return;
+        uint8_t cmd = val[0];
+        Serial.printf("[BLE CMD] 0x%02X\n", cmd);
+        if      (cmd == CMD_BUTTON) gCmdButton = true;
+        else if (cmd == CMD_HOME)   gCmdHome   = true;
+        else if (cmd == CMD_ESTOP)  gCmdEstop  = true;
+    }
+};
+
 static void setupBLE() {
     NimBLEDevice::init(BLE_DEVICE_NAME);
-    NimBLEDevice::setMTU(185);  // fits full JSON payload comfortably
+    NimBLEDevice::setMTU(185);
     NimBLEServer* server = NimBLEDevice::createServer();
     server->setCallbacks(new BleServerCallbacks());
-    server->advertiseOnDisconnect(true); // auto-restart advertising on disconnect
+    server->advertiseOnDisconnect(true);
 
     NimBLEService* svc = server->createService(BLE_SVC_UUID);
     gBleChar = svc->createCharacteristic(
         BLE_CHAR_UUID,
         NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
+    gBleCmdChar = svc->createCharacteristic(
+        BLE_CMD_UUID,
+        NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::WRITE_NR);
+    gBleCmdChar->setCallbacks(new BleCmdCallbacks());
     svc->start();
 
     NimBLEAdvertising* adv = NimBLEDevice::getAdvertising();
@@ -201,12 +238,6 @@ static int medianADC(uint8_t pin) {
         buf[j + 1] = k;
     }
     return buf[ADC_SAMPLES / 2];
-}
-
-/** VBAT voltage (V). 1:2 resistor divider, 3.3 V ADC reference, 12-bit. */
-static float readVbat() {
-    float vadc = (medianADC(PIN_VBAT) / 4095.0f) * 3.3f;
-    return vadc * 2.0f;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -295,11 +326,10 @@ static void showOLED(const char* r1, const char* r2 = "", const char* r3 = "") {
     oled.display();
 }
 
-/** Row-3 status bar: "B:67% BLE:OK" — always shown with every state message. */
+/** Row-3 status bar: "BLE:OK" — always shown with every state message. */
 static void showOLEDWithStatus(const char* r1, const char* r2 = "") {
     char r3[22];
-    snprintf(r3, sizeof(r3), "B:%d%% BLE:%s",
-             battPercent(gLastVbat),
+    snprintf(r3, sizeof(r3), "BLE:%s",
              gBleConnected ? "OK" : "--");
     showOLED(r1, r2, r3);
 }
@@ -345,13 +375,6 @@ static void doMeasure() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 static void doActuate() {
-    if (readVbat() < VBAT_CUTOFF) {
-        showOLEDWithStatus("LOW BATTERY!", "Actuation aborted");
-        Serial.println("[ACT] Aborted — low battery");
-        delay(2000);
-        return;
-    }
-
     digitalWrite(PIN_ENN, LOW); // enable all three drivers
     delay(10);                  // driver wake-up time
 
@@ -369,7 +392,9 @@ static void doActuate() {
         moveToTarget(i, gTarget[i]);
         delay(ACT_STAGGER_MS); // stagger motor starts (ref §16)
     }
-    // Leave ENN LOW — hold torque on actuators after reaching position
+    delay(20); // brief settle before disabling
+    digitalWrite(PIN_ENN, HIGH); // disable drivers — lead screw is self-locking, no holding torque needed
+    Serial.println("[ACT] Complete — drivers disabled");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -378,7 +403,7 @@ static void doActuate() {
 
 void setup() {
     Serial.begin(115200);
-    delay(300);
+    delay(3000); // wait for USB CDC host to reconnect after reset
     Serial.println("EPD 3D G6 — boot");
 
     // Stepper output pins
@@ -393,13 +418,9 @@ void setup() {
     pinMode(PIN_BUTTON, INPUT_PULLUP);
     pinMode(PIN_CONN,   INPUT_PULLDOWN);
 
-    // ADC — explicit 12-bit resolution + 11 dB attenuation on VBAT pin.
-    // 11 dB allows reading up to ~3.1 V. Half of 4.2 V battery = 2.1 V — fits.
-    // Without this, default attenuation on ESP32-C6 may cap at ~1.1 V and
-    // return corrupt readings for anything above that.
+    // ADC — 12-bit resolution, 11 dB attenuation for FSR channels (GPIO 0-3).
     analogReadResolution(12);
-    analogSetPinAttenuation(PIN_VBAT, ADC_11db);
-    Serial.printf("[ADC] VBAT raw sanity: %d\n", analogRead(PIN_VBAT));
+    analogSetAttenuation(ADC_11db);
 
     // OLED
     Wire.begin(PIN_SDA, PIN_SCL);
@@ -426,16 +447,28 @@ void setup() {
 void loop() {
     bool  conn = connPresent();
     bool  btn  = btnEdge();
-    float vbat = readVbat();
-    gLastVbat  = vbat;
 
-    // ── Hard low-battery override (any state) ────────────────────────────────
-    if (vbat > VBAT_NOISE && vbat < VBAT_CUTOFF) {
-        digitalWrite(PIN_ENN, HIGH);
-        showOLEDWithStatus("LOW BATTERY!", "Connect charger");
-        delay(5000);
-        return;
+    // ── BLE command handling (consumed once per loop) ─────────────────────
+    if (gCmdEstop) {
+        gCmdEstop = false;
+        digitalWrite(PIN_ENN, HIGH);   // disable all drivers immediately
+        showOLEDWithStatus("E-STOP", "BLE command");
+        Serial.println("[ESTOP] BLE emergency stop");
+        // Stay in current state — user must home manually or reconnect
     }
+    if (gCmdHome) {
+        gCmdHome = false;
+        if (gState != ST_HOMING && gState != ST_ACTUATING) {
+            gState = ST_HOMING;
+            Serial.println("[HOME] BLE triggered");
+        }
+    }
+    if (gCmdButton) {
+        gCmdButton = false;
+        btn = true;   // inject as physical button press
+        Serial.println("[BTN] BLE virtual press");
+    }
+
 
     // ── Connector removal — disable immediately, any state ───────────────────
     if (!conn && gState != ST_DISCON) {
@@ -464,9 +497,7 @@ void loop() {
 
         // ── Connector present, idle ───────────────────────────────────────────
         case ST_CONN: {
-            bool lowBatt = (vbat > VBAT_NOISE && vbat < VBAT_WARN);
-            showOLEDWithStatus("CONNECTED",
-                               lowBatt ? "! LOW BATTERY" : "Btn: measure");
+            showOLEDWithStatus("CONNECTED", "Btn: measure");
             if (btn) {
                 gState = ST_MEASURING;
             }
@@ -513,12 +544,39 @@ void loop() {
             break;
     }
 
+    // ── Continuous live FSR read (single sample, fast) ────────────────────
+    // Only sample when motors are not running to avoid ADC noise from switching.
+    if (gState != ST_ACTUATING && gState != ST_HOMING) {
+        int raw[3] = {
+            analogRead(PIN_FSR[0]),
+            analogRead(PIN_FSR[1]),
+            analogRead(PIN_FSR[2])
+        };
+        // Log raw values every ~1 s for calibration (every 20 loop iterations @ 50ms)
+        static uint8_t logTick = 0;
+        if (++logTick >= 20) {
+            logTick = 0;
+            Serial.printf("[LIVE] r0=%4d r1=%4d r2=%4d  ->  live%%: %d %d %d\n",
+                raw[0], raw[1], raw[2],
+                constrain((raw[0] * 100) / FSR_SCALE[0], 0, 100),
+                constrain((raw[1] * 100) / FSR_SCALE[1], 0, 100),
+                constrain((raw[2] * 100) / FSR_SCALE[2], 0, 100));
+        }
+        // Apply per-sensor noise floor and scale
+        for (int i = 0; i < 3; i++) {
+            if (raw[i] < ADC_NOISE_FLOOR)
+                gLiveRaw[i] = 0;
+            else
+                gLiveRaw[i] = constrain((raw[i] * 100) / FSR_SCALE[i], 0, 100);
+        }
+    }
+
     delay(50); // ~20 Hz main loop rate
 
-    // ── BLE notify (~4 Hz) ───────────────────────────────────────────────────
+    // ── BLE notify (~4 Hz) ───────────────────────────────────────────────
     uint32_t now = millis();
     if (gBleConnected && (now - gBleLastNotify) >= 250) {
         gBleLastNotify = now;
-        bleNotify(vbat);
+        bleNotify();
     }
 }

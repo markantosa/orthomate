@@ -1,0 +1,178 @@
+Here’s a **complete BOM** for your current design: **ESP32-C6 SuperMini + 3× TMC2209 + 4× FSR + 0.91" OLED + LiPo + TP4056 + XL6009**. This is based on the architecture and component choices in your reference doc. 
+
+# Total BOM
+
+## 1) Main modules
+
+| Qty | Item                               | Notes                         |
+| --: | ---------------------------------- | ----------------------------- |
+|   1 | **ESP32-C6 SuperMini**             | Main MCU board                |
+|   3 | **TMC2209 stepper driver modules** | STEP/DIR mode, header-mounted |
+|   1 | **0.91" OLED display**             | I2C, SSD1306/SH1106 type      |
+|   1 | **TP4056 Type-C charging module**  | 1S LiPo charging/protection   |
+|   1 | **XL6009 boost converter module**  | Boost VBAT to 5V_SYS          |
+|   1 | **1S LiPo battery**                | Recommended 2000–3000 mAh     |
+
+---
+
+## 2) Sensors and actuators
+
+| Qty | Item                                       | Notes                 |
+| --: | ------------------------------------------ | --------------------- |
+|   4 | **FSR pressure sensors**                   | One per sensing zone  |
+|   3 | **Micro linear bipolar stepper actuators** | Main insole actuators |
+
+---
+
+## 3) Passives
+
+### Battery sensing divider
+
+| Qty | Item     | Value      |
+| --: | -------- | ---------- |
+|   2 | Resistor | **100 kΩ** |
+
+### FSR analog front-end
+
+Per channel: 1× FSR divider resistor, 1× series resistor, 1× filter capacitor. 
+
+| Qty | Item      | Value      |
+| --: | --------- | ---------- |
+|   4 | Resistor  | **10 kΩ**  |
+|   4 | Resistor  | **1 kΩ**   |
+|   4 | Capacitor | **100 nF** |
+
+### ESP32 local decoupling
+
+| Qty | Item      | Value      |
+| --: | --------- | ---------- |
+|   1 | Capacitor | **10 µF**  |
+|   1 | Capacitor | **100 nF** |
+
+### XL6009 output bulk / decoupling
+
+| Qty | Item      | Value           |
+| --: | --------- | --------------- |
+|   1 | Capacitor | **470 µF**      |
+|   1 | Capacitor | **470–1000 µF** |
+|   1 | Capacitor | **100 nF**      |
+
+### Per TMC2209 local caps
+
+Per driver: 1× 100 µF VM bulk, 1× 100 nF VM, 1× 100 nF VIO. 
+
+| Qty | Item      | Value                   |
+| --: | --------- | ----------------------- |
+|   3 | Capacitor | **100 µF electrolytic** |
+|   6 | Capacitor | **100 nF ceramic**      |
+
+---
+
+## 4) Connectors and headers
+
+| Qty | Item                                            | Notes                      |
+| --: | ----------------------------------------------- | -------------------------- |
+|   1 | **20-pin main connector**                       | For power, FSRs, actuators |
+|   2 | **Female header strips for ESP32-C6 SuperMini** | Pin-socket mounting on PCB |
+|   3 | **Header sets for TMC2209 modules**             | Module plug-in mounting    |
+|   1 | **LiPo connector**                              | Match your battery type    |
+|   1 | **OLED 4-pin header**                           | VCC, GND, SDA, SCL         |
+
+---
+
+## 5) Recommended debug / service features
+
+| Qty | Item                                      | Notes                                |
+| --: | ----------------------------------------- | ------------------------------------ |
+|   3 | **PDN_UART breakout pads**                | One per TMC2209                      |
+|   3 | **DIAG breakout pads**                    | One per TMC2209                      |
+|   1 | **USB detect / charge detect connection** | For firmware lockout during charging |
+
+---
+
+# Component count summary
+
+## Functional parts
+
+* 1 ESP32-C6 SuperMini
+* 3 TMC2209 modules
+* 1 OLED
+* 1 TP4056
+* 1 XL6009
+* 1 LiPo
+* 4 FSRs
+* 3 stepper actuators
+
+## Resistors
+
+* 2 × 100 kΩ
+* 4 × 10 kΩ
+* 4 × 1 kΩ
+
+**Total resistors = 10**
+
+## Capacitors
+
+* 1 × 10 µF
+* 1 × 470 µF
+* 1 × 470–1000 µF
+* 3 × 100 µF electrolytic
+* 12 × 100 nF ceramic
+
+**Total capacitors = 18**
+
+---
+
+# Grand total by line item type
+
+If counted as individual physical components:
+
+* **Major modules / devices:** 15
+
+  * 1 ESP32
+  * 3 TMC2209
+  * 1 OLED
+  * 1 TP4056
+  * 1 XL6009
+  * 1 LiPo
+  * 4 FSR
+  * 3 steppers
+
+* **Passives:** 28
+
+  * 10 resistors
+  * 18 capacitors
+
+* **Connectors / headers / interconnects:** depends on your exact PCB implementation, but realistically:
+
+  * 1 main 20-pin connector
+  * 2 ESP32 header strips
+  * 3 TMC header sets
+  * 1 OLED header
+  * 1 battery connector
+
+So your practical BOM is about **35–45 physical parts**, excluding PCB, wires, screws, spacers, and enclosure hardware.
+
+---
+
+# Minimal purchasing BOM
+
+If you just want the parts to buy:
+
+* 1× ESP32-C6 SuperMini
+* 3× TMC2209 modules
+* 1× 0.91" I2C OLED
+* 1× TP4056 Type-C module
+* 1× XL6009 boost module
+* 1× 1S LiPo battery
+* 4× FSR sensors
+* 3× micro linear bipolar stepper actuators
+* 2× 100 kΩ resistors
+* 4× 10 kΩ resistors
+* 4× 1 kΩ resistors
+* 3× 100 µF electrolytic capacitors
+* 2× 470 µF electrolytic capacitors minimum, with one optionally up to 1000 µF
+* 12× 100 nF ceramic capacitors
+* 1× 10 µF capacitor
+* headers / connectors as needed
+

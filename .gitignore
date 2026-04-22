@@ -19,6 +19,15 @@ Thumbs.db
 # KiCad project folder (kept locally only — gerbers exported to V2 PCB/)
 kicad pcb/
 
+# Android — API keys / secrets
+android_app/app/src/main/java/com/epd3dg6/bleapp/MainActivity.kt
+
+# Android build outputs
+android_app/app/build/
+android_app/.gradle/
+android_app/.idea/
+android_app/local.properties
+
 # KiCad auto-save, lock, backup, cache, and local history
 **/\#auto_saved_files\#
 **/_autosave-*

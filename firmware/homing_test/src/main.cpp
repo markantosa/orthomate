@@ -23,9 +23,9 @@ static constexpr uint8_t PIN_DIR  = 19;
 static constexpr uint8_t PIN_ENN  = 7;
 
 // ── Motion parameters ────────────────────────────────────────────────────────
-static constexpr uint32_t STEPS_PER_MM         = 1536;  // calibrated: 7680 steps = 5mm
-static constexpr uint32_t STEPS_FULL_TRAVEL    = 18432; // 12mm full stroke (1536 * 12)
-static constexpr uint32_t STEPS_HOME_OVERSHOOT = 22000; // overdrive past full travel to guarantee end stop
+static constexpr uint32_t STEPS_PER_MM         = 1625;  // 
+static constexpr uint32_t STEPS_FULL_TRAVEL    = 19500; // 
+static constexpr uint32_t STEPS_HOME_OVERSHOOT = 21000; // overdrive past full travel to guarantee end stop
 
 static constexpr uint32_t STEP_PULSE_US       = 5;    // step HIGH pulse width (µs)
 static constexpr uint32_t STEP_NORMAL_DELAY   = 300;  // normal speed ~3200 steps/s

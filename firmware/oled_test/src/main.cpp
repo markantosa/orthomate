@@ -2,8 +2,8 @@
  * OLED screen test — EPD 3D G6
  *
  * Display: 128×64 SSD1306 (I2C)
- *   SCL → GPIO15
- *   SDA → GPIO9
+ *   SCL → GPIO6
+ *   SDA → GPIO7
  *   VCC → 3.3V
  *   GND → GND
  *
@@ -17,8 +17,8 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-static constexpr uint8_t PIN_SCL   = 15;
-static constexpr uint8_t PIN_SDA   = 9;
+static constexpr uint8_t PIN_SCL   = 6;
+static constexpr uint8_t PIN_SDA   = 7;
 static constexpr uint8_t OLED_ADDR = 0x3C;
 static constexpr int     OLED_W    = 128;
 static constexpr int     OLED_H    = 64;
