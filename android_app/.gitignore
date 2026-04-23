@@ -1,0 +1,19 @@
+# Android Studio / IntelliJ
+.idea/
+*.iml
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+.DS_Store
+
+# Kotlin
+.kotlin/
+
+# User-specific
+*.apk
+*.ap_
+*.dex
+*.class
