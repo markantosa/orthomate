@@ -17,3 +17,8 @@ local.properties
 *.ap_
 *.dex
 *.class
+
+# Orthomate Extra Files (Keep local)
+FIRMWARE_MAIN.md
+Orthomate Logo.png
+for gemini/
