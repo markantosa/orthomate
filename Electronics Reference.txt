@@ -1,0 +1,468 @@
+# 🔧 Orthomate
+
+## Hardware Design Reference (FINAL)
+
+### **Revision V6.0 — ENN hardwired, OLED GPIO6/7, VBAT GPIO15, new J9 connector layout**
+
+---
+
+# 1. System Overview
+
+Battery-powered adaptive orthopedic insole controller.
+
+### Insole:
+
+* 3× micro linear bipolar stepper actuators
+* 4× FSR pressure sensors
+
+### Controller:
+
+* ESP32-C6 SuperMini (header-mounted)
+* 3× TMC2209 (STEP/DIR mode, header-mounted)
+* FSR analog front-end
+* TP4056 Type-C charging module
+* XL6009 boost converter → 5V system rail
+* **0.91" OLED display (I2C)**
+
+---
+
+# 2. Power Architecture (MANDATORY)
+
+```
+3.7V LiPo
+  │
+  └── TP4056
+         │
+         └── VBAT (3.0–4.2V)
+                │
+                └── XL6009 boost
+                       │
+                       └── 5V_SYS
+                              ├── ESP32 (VIN / 5V)
+                              └── TMC2209 VM (x3)
+```
+
+---
+
+## Rails
+
+| Rail   | Voltage  | Notes         |
+| ------ | -------- | ------------- |
+| VBAT   | 3.0–4.2V | Battery       |
+| 5V_SYS | 5V       | Boost output  |
+| 3V3    | 3.3V     | ESP32 onboard |
+| GND    | 0V       | Common        |
+
+---
+
+## Critical Rule
+
+> ESP32 MUST be powered from **5V_SYS**, not LiPo directly
+
+---
+
+# 3. Charging Behavior
+
+TP4056 is **NOT power-path managed**
+
+### Rule:
+
+> Charging and actuation must NOT occur simultaneously
+
+### Firmware:
+
+```
+STEPPER_ENN = HIGH (disable drivers)
+```
+
+---
+
+# 4. Power Stability
+
+### XL6009 Output (on PCB)
+
+* 470µF bulk
+* * optional 470–1000µF
+* 100nF ceramic
+
+### ESP32
+
+* 10µF
+* 100nF
+
+### Per TMC2209
+
+* 100µF (VM)
+* 100nF (VM)
+* 100nF (VIO)
+
+---
+
+# 5. Battery Monitoring
+
+```
+VBAT ── 100k ──+──→ GPIO5 (ADC1 ch5)
+               |
+              100k
+               |
+              GND
+```
+
+---
+
+# 6. FINAL ESP32-C6 PIN ASSIGNMENT (UPDATED)
+
+## ⚠️ Constraint-aware mapping (SuperMini breakout)
+
+---
+
+## Analog Inputs (ADC-safe zone)
+
+| Function   | GPIO  |
+| ---------- | ----- |
+| FSR1       | GPIO0 |
+| FSR2       | GPIO1 |
+| FSR3       | GPIO2 |
+| FSR4       | GPIO3 |
+
+---
+
+## VBAT Monitor
+
+| Function   | GPIO  | Note                    |
+| ---------- | ----- | ----------------------- |
+| VBAT_SENSE | GPIO5 | ADC1 channel 5 — fully ADC-capable |
+
+---
+
+## Stepper Control
+
+| Actuator | STEP   | DIR    |
+| -------- | ------ | ------ |
+| ACT1     | GPIO20 | GPIO19 |
+| ACT2     | GPIO18 | GPIO14 |
+| ACT3     | GPIO16 | GPIO17 |
+
+---
+
+## ENN (Shared Enable)
+
+All TMC2209 ENN pins are **hardwired to GND on the PCB** (always enabled).
+No firmware GPIO required.
+
+---
+
+## OLED (I2C)
+
+| Signal | GPIO  |
+| ------ | ----- |
+| SDA    | GPIO7 |
+| SCL    | GPIO6 |
+
+---
+
+## User Input
+
+| Function     | GPIO   |
+| ------------ | ------ |
+| MODE_BTN     | GPIO4  |
+| CONN_DETECT  | GPIO15 |
+
+---
+
+## ⚠️ Pin Notes (IMPORTANT)
+
+| Pin       | Note                                                                                                  |
+| --------- | ----------------------------------------------------------------------------------------------------- |
+| GPIO4     | Strapping pin → button must NOT be held at boot                                                       |
+| GPIO5     | VBAT_SENSE — ADC1 ch5; 100k/100k divider to VBAT                                                     |
+| GPIO6     | OLED SCL — strapping-safe, pull-up OK                                                                 |
+| GPIO7     | OLED SDA (previously STEPPER_ENN)                                                                     |
+| GPIO15    | CONN_DETECT — INPUT_PULLDOWN (internal ~45k); loopback via insole 10k; no external pulldown needed    |
+| GPIO16/17 | UART default → now used for STEP/DIR                                                                  |
+| GPIO8     | Avoid (often onboard LED)                                                                             |
+
+---
+
+# 7. Stepper Driver Architecture
+
+## TMC2209 ×3
+
+### Power
+
+* VM → 5V_SYS
+* VIO → 3V3
+* GND → GND
+
+### Control
+
+* STEP / DIR → ESP32
+* ENN → **GND (hardwired on PCB)** — always enabled; no firmware GPIO required
+
+### Motor Outputs
+
+* OA1/OA2 → Coil A
+* OB1/OB2 → Coil B
+
+---
+
+## Debug Pads (REQUIRED)
+
+Expose:
+
+* PDN_UART
+* DIAG
+
+---
+
+# 8. FSR Analog Front-End
+
+Per channel:
+
+```
+3V3
+ |
+FSR
+ |
+ +---- RAW ---- 1k ----> ADC (GPIO0–3)
+ |
+10k
+ |
+GND
+```
+
+At ADC:
+
+* 100nF → GND
+
+---
+
+# 9. OLED Display
+
+| OLED | ESP32  |
+| ---- | ------ |
+| VCC  | 3V3    |
+| GND  | GND    |
+| SDA  | GPIO7  |
+| SCL  | GPIO6  |
+
+---
+
+# 10. Connector Definition
+
+## J_MAIN (20-pin)
+
+**Footprint:** `Connector_Generic:Conn_02x10_Odd/Even`
+(Row A = odd pins 1/3/5…19, Row B = even pins 2/4/6…20)
+
+### Physical layout
+
+| Row | Pin A (odd) | Signal A    | Signal B     | Pin B (even) |
+| --- | ----------- | ----------- | ------------ | ------------ |
+| 1   | 1           | ACT1_OA2    | GND          | 2            |
+| 2   | 3           | ACT1_OA1    | GND          | 4            |
+| 3   | 5           | ACT1_OB1    | 3V3          | 6            |
+| 4   | 7           | ACT1_OB2    | CONN_DETECT  | 8            |
+| 5   | 9           | ACT2_OA2    | FSR4         | 10           |
+| 6   | 11          | ACT2_OA1    | FSR3         | 12           |
+| 7   | 13          | ACT2_OB1    | FSR2         | 14           |
+| 8   | 15          | ACT2_OB2    | FSR1         | 16           |
+| 9   | 17          | ACT3_OA2    | ACT3_OB2     | 18           |
+| 10  | 19          | ACT3_OA1    | ACT3_OB1     | 20           |
+
+### Per-pin reference
+
+### Loopback detect circuit
+
+```
+Controller PCB:         Insole PCB:
+pin 6 (3V3) ──────────── 10k ──── pin 8 (CONN_DETECT)
+                                        │
+                                   GPIO15 (INPUT_PULLDOWN, ~45k internal)
+                                        │
+                                       GND
+```
+
+* Unplugged → GPIO5 pulled LOW by internal pulldown → CONN_DETECT = 0
+* Plugged in → 3V3 through insole 10k + internal ~45k divider → **V_GPIO5 ≈ 2.7V** → CONN_DETECT = 1
+* No external pulldown resistor needed on controller PCB
+* Insole only needs one 0402 10k between pin 1 and pin 2
+
+### Per-pin reference
+
+| Pin | Signal       | Notes                                                      |
+| --- | ------------ | ---------------------------------------------------------- |
+| 1   | ACT1_OA2     | TMC2209 OA2 → ACT1 coil A−                                |
+| 2   | GND          | Power return                                               |
+| 3   | ACT1_OA1     | TMC2209 OA1 → ACT1 coil A+                                |
+| 4   | GND          | Power return                                               |
+| 5   | ACT1_OB1     | TMC2209 OB1 → ACT1 coil B+                                |
+| 6   | 3V3          | Source for loopback detect; drives insole 10k              |
+| 7   | ACT1_OB2     | TMC2209 OB2 → ACT1 coil B−                                |
+| 8   | CONN_DETECT  | → GPIO5 (INPUT_PULLDOWN); HIGH = insole connected          |
+| 9   | ACT2_OA2     | TMC2209 OA2 → ACT2 coil A−                                |
+| 10  | FSR4         | → GPIO3 (ADC)                                              |
+| 11  | ACT2_OA1     | TMC2209 OA1 → ACT2 coil A+                                |
+| 12  | FSR3         | → GPIO2 (ADC)                                              |
+| 13  | ACT2_OB1     | TMC2209 OB1 → ACT2 coil B+                                |
+| 14  | FSR2         | → GPIO1 (ADC)                                              |
+| 15  | ACT2_OB2     | TMC2209 OB2 → ACT2 coil B−                                |
+| 16  | FSR1         | → GPIO0 (ADC)                                              |
+| 17  | ACT3_OA2     | TMC2209 OA2 → ACT3 coil A−                                |
+| 18  | ACT3_OB2     | TMC2209 OB2 → ACT3 coil B−                                |
+| 19  | ACT3_OA1     | TMC2209 OA1 → ACT3 coil A+                                |
+| 20  | ACT3_OB1     | TMC2209 OB1 → ACT3 coil B+                                |
+
+---
+
+# 11. PCB Zoning
+
+## Zone A — Power
+
+* LiPo
+* TP4056
+* XL6009
+* bulk caps
+
+## Zone B — Stepper
+
+* TMC2209
+* motor outputs
+
+## Zone C — Logic + Analog
+
+* ESP32
+* FSR circuits
+* OLED
+
+> Keep Zone C far from boost + motors 
+
+---
+
+# 12. Ground Strategy
+
+**Trunk + Branch**
+
+* Battery GND = origin
+* Separate:
+
+  * Power return
+  * Logic return
+  * Analog return
+
+> NEVER mix motor return with analog ground 
+
+---
+
+# 13. Routing Priorities
+
+1. Power
+2. Motor outputs
+3. STEP/DIR
+4. Analog
+5. I2C
+
+---
+
+## Trace Widths
+
+| Type    | Width       |
+| ------- | ----------- |
+| Power   | 1.5–2.0 mm  |
+| Motor   | 0.8–1.2 mm  |
+| Digital | 0.25–0.4 mm |
+| Analog  | 0.25–0.4 mm |
+
+---
+
+# 14. Boost Layout Rules
+
+* Keep far from analog
+* Minimize loop area
+* Thick traces
+* Treat as **noise source**
+
+---
+
+# 15. Firmware Interaction Rules
+
+## Motion
+
+* Do NOT start all motors at once
+* Delay 50–100 ms
+
+## ADC
+
+* Sample when motors idle OR median filter
+
+## OLED
+
+* 5–10 Hz update
+* Avoid switching spikes
+
+---
+
+# 16. Bring-Up Sequence
+
+1. Power only
+2. Validate ADC + 3.3V
+3. Test OLED
+4. Test 1 driver
+5. Scale
+
+---
+
+# 17. Risks & Mitigation
+
+## R1 — FSR Noise
+
+* RC filter
+* zoning
+
+## R2 — Power instability
+
+* bulk caps
+
+## R3 — Charging conflict
+
+* firmware lockout
+
+## R4 — Boot issues (NEW)
+
+* avoid pulling GPIO4 during boot
+
+---
+
+# 18. Battery Recommendation
+
+* Minimum: 1000mAh
+* Recommended: 2000–3000mAh
+* Preferred: ≥3000mAh
+
+---
+
+# 19. Final Summary
+
+* 1S LiPo
+* TP4056
+* XL6009 → 5V_SYS
+* ESP32-C6 (limited GPIO map)
+* 3× TMC2209
+* 4× FSR (ADC0–3)
+* OLED (GPIO9/15)
+* Shared ENN (GPIO7)
+* Button on GPIO4 (boot-safe usage)
+* Connector detect on GPIO5 (INPUT_PULLDOWN)
+* Single-layer PCB
+
+---
+
+# 🧠 What changed (important insight)
+
+This new version is:
+
+* **pin-constrained but valid**
+* **boot-safe (if used correctly)**
+* **still routable single-layer (with good placement)**
+
+---
