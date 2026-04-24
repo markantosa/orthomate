@@ -2,7 +2,7 @@
 
 Battery-powered adaptive orthopedic insole controller. Redistributes plantar pressure in real-time using three micro linear stepper actuators driven by force sensor feedback. Includes a BLE companion Android app for live monitoring.
 
-> **🏆 Winner — Top Project, EPD Exhibition 2025**
+> **🏆 Winner — Top Course Project, EPD 3D Exhibition April 2026**
 
 ## Hardware at a glance
 
