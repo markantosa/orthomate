@@ -17,7 +17,7 @@
     },
     "prototype_zone_fills": false,
     "selection_filter": {
-      "dimensions": true,
+      "dimensions": false,
       "footprints": true,
       "graphics": true,
       "keepouts": true,
@@ -89,7 +89,7 @@
       9
     ],
     "col_widths": [
-      76,
+      70,
       70,
       98,
       79,
@@ -97,8 +97,8 @@
       99,
       88,
       83,
-      46,
-      46
+      43,
+      44
     ],
     "custom_group_rules": [],
     "expanded_rows": [],

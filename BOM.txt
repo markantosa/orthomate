@@ -1,4 +1,12 @@
-Here’s a **complete BOM** for your current design: **ESP32-C6 SuperMini + 3× TMC2209 + 4× FSR + 0.91" OLED + LiPo + TP4056 + XL6009**. This is based on the architecture and component choices in your reference doc. 
+Complete BOM for the Orthomate system: **ESP32-C6 SuperMini + 3× TMC2209 + 4× FSR + 0.91" OLED + LiPo + TP4056 + XL6009**.
+
+## PCB overview
+
+Orthomate uses two custom PCBs:
+
+**Controller PCB** — mounted in a housing at the rear of the shoe. Contains the ESP32-C6, three TMC2209 stepper driver modules, TP4056 charger, XL6009 boost converter, battery voltage divider, OLED connector, and the 20-pin connector (J9) linking to the insole. The LiPo battery sits in the same heel housing.
+
+**Insole PCB** — sits directly underfoot inside the shoe. Hosts the four FSR pressure-sensing zones (metatarsal, arch, calcaneus, auxiliary) with their analog front-end filter networks, and provides mechanical mounting points for the three micro linear stepper actuator assemblies. Connects to the controller PCB via a 20-pin ribbon/wire harness through J9.
 
 # Total BOM
 

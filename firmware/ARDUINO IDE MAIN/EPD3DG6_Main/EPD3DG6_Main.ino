@@ -60,8 +60,8 @@
 
 static constexpr uint8_t PIN_FSR[4]  = {0, 1, 2, 3};   // ADC — FSR1–4
 static constexpr uint8_t PIN_ENN     = 7;                // STEPPER_ENN shared (active LOW)
-static constexpr uint8_t PIN_STEP[3] = {20, 18, 16};    // ACT1 ACT2 ACT3 STEP
-static constexpr uint8_t PIN_DIR[3]  = {19, 14, 17};    // ACT1 ACT2 ACT3 DIR
+static constexpr uint8_t PIN_STEP[3] = {20, 16, 18};    // ACT1 ACT2(arch) ACT3(heel—dead, broken pad)
+static constexpr uint8_t PIN_DIR[3]  = {19, 17, 14};    // ACT1 ACT2(arch) ACT3(heel—dead, broken pad)
 static constexpr uint8_t PIN_SDA     = 7;                // OLED SDA — GPIO7 (hw ref v6.0)
 static constexpr uint8_t PIN_SCL     = 6;                // OLED SCL — GPIO6 (hw ref v6.0)
 static constexpr uint8_t PIN_BUTTON  = 4;               // INPUT_PULLUP, LOW = pressed (boot-safe)
@@ -282,10 +282,12 @@ static bool btnEdge() {
 /**
  * Send pulses on one stepper axis.
  * Positive steps = DIR HIGH (extend), negative = DIR LOW (retract).
+ * dirInvert flips the physical DIR pin for axes wired in reverse.
  */
-static void driveSteps(uint8_t sp, uint8_t dp, int32_t steps) {
+static void driveSteps(uint8_t sp, uint8_t dp, int32_t steps, bool dirInvert = false) {
     if (!steps) return;
-    digitalWrite(dp, (steps > 0) ? HIGH : LOW);
+    bool extend = (steps > 0) ^ dirInvert;
+    digitalWrite(dp, extend ? HIGH : LOW);
     delayMicroseconds(2); // DIR setup time before first pulse
     uint32_t n = (uint32_t)abs((long)steps);
     for (uint32_t i = 0; i < n; i++) {
@@ -296,9 +298,11 @@ static void driveSteps(uint8_t sp, uint8_t dp, int32_t steps) {
 
 /** Move actuator `idx` to absolute target steps from home. Updates gPos. */
 static void moveToTarget(int idx, int32_t target) {
+    // Set true for any axis whose DIR wiring is physically reversed.
+    static constexpr bool DIR_INVERT[3] = {true, false, false}; // ACT1 flipped
     int32_t delta = target - gPos[idx];
     if (!delta) return;
-    driveSteps(PIN_STEP[idx], PIN_DIR[idx], delta);
+    driveSteps(PIN_STEP[idx], PIN_DIR[idx], delta, DIR_INVERT[idx]);
     gPos[idx] = target;
 }
 

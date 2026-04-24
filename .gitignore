@@ -27,3 +27,18 @@ local.properties
 **/.gradle/
 **/.idea/
 **/FSR Snapshot.png
+
+# KiCad generated/backup files
+**/*.kicad_sch-bak
+**/*-backups/
+**/.history/
+**/fp-info-cache
+
+# PlatformIO build output
+**/.pio/
+
+# VS Code workspace folders
+**/.vscode/
+
+# MainActivity.kt (contains API key)
+android_app/app/src/main/java/com/epd3dg6/bleapp/MainActivity.kt

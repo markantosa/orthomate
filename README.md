@@ -2,6 +2,8 @@
 
 Battery-powered adaptive orthopedic insole controller. Redistributes plantar pressure in real-time using three micro linear stepper actuators driven by force sensor feedback. Includes a BLE companion Android app for live monitoring.
 
+> **🏆 Winner — Top Project, EPD Exhibition 2025**
+
 ## Hardware at a glance
 
 | Component | Detail |
@@ -17,31 +19,72 @@ Battery-powered adaptive orthopedic insole controller. Redistributes plantar pre
 | User input | 1× momentary mode button |
 | BLE | NimBLE-Arduino 2.5.0 — advertises as `EPD3DG6` |
 
+## PCB placement
+
+Orthomate uses two custom PCBs that work together inside a modified shoe:
+
+**Controller PCB** — mounts in a housing at the rear of the shoe. Houses the ESP32-C6, three TMC2209 stepper drivers, TP4056 charger, XL6009 boost converter, and the 20-pin connector (J9) to the insole. The LiPo battery sits alongside it in the heel housing.
+
+**Insole PCB** — sits directly underfoot inside the shoe. Hosts the four FSR pressure-sensing zones (metatarsal, arch, calcaneus, auxiliary) and the three micro linear stepper actuator assemblies. The actuators extend upward to redistribute localised plantar pressure. Connects back to the controller PCB via a 20-pin ribbon/wire harness.
+
+[![Controller PCB](Exhibition%20Files%20and%20Photos/Controller%20PCB%20KiCad%20Screenshot.png)](Exhibition%20Files%20and%20Photos/Controller%20PCB%20KiCad%20Screenshot.png)
+
+## Exhibition highlights
+
+### Final product
+
+![Final Product Shot](Exhibition%20Files%20and%20Photos/Final%20Product%20Shot.jpg)
+
+### ANSYS stress analysis
+
+![Stress Analysis](Exhibition%20Files%20and%20Photos/Stress%20Analysis%20Colour%20Plot%20Ansys%20GIF.gif)
+
+### Exhibition day
+
+![Exhibition Booth](Exhibition%20Files%20and%20Photos/Exhibition%20Photo%202.jpg)
+
+![Team at Exhibition](Exhibition%20Files%20and%20Photos/Exhibition%20Photo%201.jpg)
+
+![Group Shot](Exhibition%20Files%20and%20Photos/Group%20Shot.jpg)
+
+### Poster
+
+![Orthomate Poster](Exhibition%20Files%20and%20Photos/Orthomate%20Poster.png)
+
+### Downloadable resources
+
+- [Orthomate Final Slides (PDF)](Exhibition%20Files%20and%20Photos/Orthomate%20Final%20Slides.pdf)
+- [Orthomate Poster (PDF)](Exhibition%20Files%20and%20Photos/Orthomate%20Poster.pdf)
+
 ## Repository structure
 
 ```
 orthomate/
-├── Electronics Reference.txt   # Hardware design spec (v6.0)
-├── BOM.txt                     # Bill of materials
+├── Electronics Reference.txt           # Hardware design spec (v6.0)
+├── BOM.txt                             # Bill of materials
 ├── firmware/
-│   ├── main/                   # Full operational firmware (PlatformIO)
+│   ├── main/                           # Full operational firmware (PlatformIO)
 │   │   ├── platformio.ini
 │   │   └── src/main.cpp
-│   ├── ARDUINO IDE APP TEST/   # Minimal Arduino IDE sketch for BLE app testing
+│   ├── ARDUINO IDE MAIN/               # Arduino IDE version of the full firmware
+│   │   └── EPD3DG6_Main/EPD3DG6_Main.ino
+│   ├── ARDUINO IDE APP TEST/           # Minimal Arduino IDE sketch for BLE app testing
 │   │   └── sketch_apr14a/sketch_apr14a.ino
-│   ├── stepper_test/           # Single-axis stepper back-and-forth smoke test
-│   ├── homing_test/            # Blind homing: retract to min, extend to 12 mm
-│   ├── button_test/            # Button + OLED input test
-│   └── oled_test/              # OLED display test
-├── android_app/                # Kotlin/Compose BLE companion app
-│   ├── app/src/main/java/com/epd3dg6/bleapp/MainActivity.kt
+│   ├── stepper_test/                   # Single-axis stepper back-and-forth smoke test
+│   ├── homing_test/                    # Blind homing: retract to min, extend to 12 mm
+│   ├── button_test/                    # Button + OLED input test
+│   └── oled_test/                      # OLED display test
+├── android_app/                        # Kotlin/Compose BLE companion app
 │   └── app/src/main/AndroidManifest.xml
-├── kicad pcb/                  # KiCad schematic + layout files
-├── drill files/                # Gerber drill files (latest PCB)
+├── Controller PCB KiCad Files/         # KiCad schematic + layout for controller PCB
+├── Controller PCB Iterations/          # Gerber files from each revision (V2–V5)
+├── Insole PCB KiCad Files/             # KiCad schematic + layout for insole PCB
+├── Insole PCB Iterations/              # Gerber files from each revision
+├── Exhibition Files and Photos/        # Exhibition media, poster, and slides
 └── docs/
-    ├── FIRMWARE_MAIN.md        # Detailed firmware walkthrough
-    ├── FLASH_GUIDE.md          # PlatformIO build & upload instructions
-    ├── ANDROID_APP_GUIDE.md    # Android app build & sideload instructions
+    ├── FIRMWARE_MAIN.md                # Detailed firmware walkthrough
+    ├── FLASH_GUIDE.md                  # PlatformIO build & upload instructions
+    ├── ANDROID_APP_GUIDE.md            # Android app build & sideload instructions
     └── TMC2209_CURRENT_TUNING.md
 ```
 
@@ -100,11 +143,11 @@ The Android app (`android_app/`) displays real-time FSR forces as animated colou
 | 5 | VBAT\_SENSE (ADC1 ch5, 11 dB attenuation, 1:2 divider) |
 | 6 | OLED SCL (I2C) |
 | 7 | OLED SDA (I2C) |
-| 14 | ACT2\_DIR |
+| 14 | ACT3\_DIR ⚠ dead channel (stepper motor pad detached) |
 | 15 | CONN\_DETECT (INPUT\_PULLDOWN) |
-| 16 | ACT3\_STEP |
-| 17 | ACT3\_DIR |
-| 18 | ACT2\_STEP |
+| 16 | ACT2\_STEP (arch actuator) |
+| 17 | ACT2\_DIR (arch actuator) |
+| 18 | ACT3\_STEP ⚠ dead channel (stepper motor pad detached) |
 | 19 | ACT1\_DIR |
 | 20 | ACT1\_STEP |
 
