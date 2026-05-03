@@ -27,7 +27,7 @@ Orthomate uses two custom PCBs that work together inside a modified shoe:
 
 **Insole PCB** — sits directly underfoot inside the shoe. Hosts the four FSR pressure-sensing zones (metatarsal, arch, calcaneus, auxiliary) and the three micro linear stepper actuator assemblies. The actuators extend upward to redistribute localised plantar pressure. Connects back to the controller PCB via a 20-pin ribbon/wire harness.
 
-[![Controller PCB](Exhibition%20Files%20and%20Photos/Controller%20PCB%20KiCad%20Screenshot.png)](Exhibition%20Files%20and%20Photos/Controller%20PCB%20KiCad%20Screenshot.png)
+<img src="Exhibition%20Files%20and%20Photos/Controller%20PCB%20KiCad%20Screenshot.png" width="48%" alt="Controller PCB"> <img src="Exhibition%20Files%20and%20Photos/Insole%203D%20model.jpg" width="48%" alt="Insole 3D Model">
 
 ## Exhibition highlights
 
@@ -37,19 +37,17 @@ Orthomate uses two custom PCBs that work together inside a modified shoe:
 
 ### ANSYS stress analysis
 
-![Stress Analysis](Exhibition%20Files%20and%20Photos/Stress%20Analysis%20Colour%20Plot%20Ansys%20GIF.gif)
+<img src="Exhibition%20Files%20and%20Photos/Stress%20Analysis%20Colour%20Plot%20Ansys%20GIF.gif" width="60%" alt="Stress Analysis">
 
 ### Exhibition day
 
-![Exhibition Booth](Exhibition%20Files%20and%20Photos/Exhibition%20Photo%202.jpg)
+<img src="Exhibition%20Files%20and%20Photos/Exhibition%20Photo%202.jpg" width="48%" alt="Exhibition Booth"> <img src="Exhibition%20Files%20and%20Photos/Exhibition%20Photo%201.jpg" width="48%" alt="Team at Exhibition">
 
-![Team at Exhibition](Exhibition%20Files%20and%20Photos/Exhibition%20Photo%201.jpg)
-
-![Group Shot](Exhibition%20Files%20and%20Photos/Group%20Shot.jpg)
+<img src="Exhibition%20Files%20and%20Photos/Group%20Shot.jpg" width="60%" alt="Group Shot">
 
 ### Poster
 
-![Orthomate Poster](Exhibition%20Files%20and%20Photos/Orthomate%20Poster.png)
+<img src="Exhibition%20Files%20and%20Photos/Orthomate%20Poster.png" width="70%" alt="Orthomate Poster">
 
 ### Downloadable resources
 
