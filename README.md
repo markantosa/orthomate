@@ -2,7 +2,7 @@
 
 Battery-powered adaptive orthopedic insole controller. Redistributes plantar pressure in real-time using three micro linear stepper actuators driven by force sensor feedback. Includes a BLE companion Android app for live monitoring.
 
-> **🏆 Winner — Top Project, EPD Exhibition 2025**
+> **🏆 Winner — Top Course Project, EPD 3D Exhibition April 2026**
 
 ## Hardware at a glance
 
@@ -23,9 +23,9 @@ Battery-powered adaptive orthopedic insole controller. Redistributes plantar pre
 
 Orthomate uses two custom PCBs that work together inside a modified shoe:
 
-**Controller PCB** — mounts in a housing at the rear of the shoe. Houses the ESP32-C6, three TMC2209 stepper drivers, TP4056 charger, XL6009 boost converter, and the 20-pin connector (J9) to the insole. The LiPo battery sits alongside it in the heel housing.
+**Controller PCB** — mounts in a controller module. Houses the ESP32-C6, three TMC2209 stepper drivers, TP4056 charger, XL6009 boost converter, and the 20-pin connector (J9) to the insole. The LiPo battery sits alongside it.
 
-**Insole PCB** — sits directly underfoot inside the shoe. Hosts the four FSR pressure-sensing zones (metatarsal, arch, calcaneus, auxiliary) and the three micro linear stepper actuator assemblies. The actuators extend upward to redistribute localised plantar pressure. Connects back to the controller PCB via a 20-pin ribbon/wire harness.
+**Insole PCB** — sits directly underfoot inside the shoe. Hosts the three FSR pressure-sensing zones (metatarsal, arch, calcaneus) and the three micro linear stepper actuator assemblies. The actuators extend upward to redistribute localised plantar pressure. Connects back to the controller PCB via a 20-pin ribbon/wire harness.
 
 <img src="Exhibition%20Files%20and%20Photos/Controller%20PCB%20KiCad%20Screenshot.png" width="48%" alt="Controller PCB"> <img src="Exhibition%20Files%20and%20Photos/Insole%203D%20model.jpg" width="48%" alt="Insole 3D Model">
 
